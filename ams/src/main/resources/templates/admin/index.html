@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html
+  class="loading"
+  lang="en"
+  data-textdirection="ltr"
+  xmlns:th="http://www.thymeleaf.org"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Attendance Management System</title>
+    <link href="assets/img/favicon.png" rel="icon" />
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+
+    <link href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+      rel="stylesheet"
+    />
+
+    <link
+      href="assets/vendor/bootstrap/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="assets/vendor/bootstrap-icons/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet" />
+    <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet" />
+    <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet" />
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet" />
+    <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet" />
+
+    <link href="assets/css/style.css" rel="stylesheet" />
+
+    <script>
+      function preventBack() {
+        window.history.forward();
+      }
+
+      setTimeout("preventBack()", 0);
+
+      window.onunload = function () {
+        null;
+      };
+    </script>
+  </head>
+
+  <body>
+    <div th:replace="~{admin/nav :: body}"></div>
+
+    <main id="main" class="main">
+      <div class="pagetitle">
+        <h1>Dashboard</h1>
+        <nav>
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+            <li class="breadcrumb-item active">Dashboard</li>
+          </ol>
+        </nav>
+      </div>
+
+      <section class="section dashboard">
+        <div class="col-12">
+          <div class="row">
+            <div class="col-4">
+              <div class="card info-card">
+                <div class="card-body">
+                  <h5 class="card-title mb-2">Faculty</h5>
+                  <div class="row align-items-center text-center text-md-start">
+                    <div
+                      class="col-2 col-md-2 rounded-circle d-flex align-items-center justify-content-center"
+                    >
+                      <div
+                        class="card-icon rounded-circle d-flex align-items-center"
+                        style="margin-left: 50px"
+                      >
+                        <i class="fas fa-city"></i>
+                      </div>
+                    </div>
+                    <div class="col-10 col-md-10">
+                      <h6 id="faculty-count" style="margin-left: 15px"></h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="card info-card">
+                <div class="card-body">
+                  <h5 class="card-title mb-2">Departments</h5>
+                  <div class="row align-items-center text-center text-md-start">
+                    <div
+                      class="col-2 col-md-2 rounded-circle d-flex align-items-center justify-content-center"
+                    >
+                      <div
+                        class="card-icon rounded-circle d-flex align-items-center"
+                        style="margin-left: 50px"
+                      >
+                        <i class="fas fa-building"></i>
+                      </div>
+                    </div>
+                    <div class="col-10 col-md-10">
+                      <h6 id="department-count" style="margin-left: 15px"></h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="card info-card">
+                <div class="card-body">
+                  <h5 class="card-title mb-2">Programs</h5>
+                  <div class="row align-items-center text-center text-md-start">
+                    <div
+                      class="col-2 col-md-2 rounded-circle d-flex align-items-center justify-content-center"
+                    >
+                      <div
+                        class="card-icon rounded-circle d-flex align-items-center"
+                        style="margin-left: 50px"
+                      >
+                        <i class="fas fa-graduation-cap"></i>
+                      </div>
+                    </div>
+                    <div class="col-10 col-md-10">
+                      <h6 id="program-count" style="margin-left: 15px"></h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="row">
+            <div class="col-6">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Upcoming Events</h5>
+                  <table class="table-custom">
+                    <thead>
+                      <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Time</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Details</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr th:each="schedule : ${schedules}">
+                        <td
+                          th:text="${schedule.day} + '-' + ${schedule.month} + '-' + ${schedule.year}"
+                        ></td>
+                        <td
+                          class="time"
+                          th:text="${schedule.startTime} + ' to ' + ${schedule.endTime}"
+                        ></td>
+                        <td th:text="${schedule.schedule}"></td>
+                        <td th:text="${schedule.details}"></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Leave Application</h5>
+                  <table class="table-custom">
+                    <thead>
+                      <tr>
+                        <th scope="col" style="width: 50px">Id</th>
+                        <th scope="col">Teacher</th>
+                        <th scope="col">Leave Type</th>
+                        <th scope="col">No of Leave</th>
+                        <th scope="col">Half Day</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr th:each="leave : ${leaves}">
+                        <td th:text="${leave.leaveBy.teacherid}"></td>
+                        <td
+                          th:text="${leave.leaveBy.fname} + ' ' + ${leave.leaveBy.lname}"
+                        ></td>
+                        <td th:text="${leave.leaveType.leaveType}"></td>
+                        <td th:text="${leave.totalLeaveDays}"></td>
+                        <td>
+                          <p th:if="${leave.halfDay}">YES</p>
+                          <p th:unless="${leave.halfDay}">NO</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        fetch("/api/getAllFaculties")
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById(
+              "faculty-count"
+            ).innerHTML = `${data.length} <br> Faculty`;
+          })
+          .catch((error) => console.error("Error fetching faculties:", error));
+
+        fetch("/api/getAllDepartments")
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById(
+              "department-count"
+            ).innerHTML = `${data.length} <br> Departments`;
+          })
+          .catch((error) =>
+            console.error("Error fetching departments:", error)
+          );
+
+        fetch("/api/getAllPrograms")
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById(
+              "program-count"
+            ).innerHTML = `${data.length} <br> Programs`;
+          })
+          .catch((error) => console.error("Error fetching programs:", error));
+      });
+    </script>
+
+    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="assets/vendor/echarts/echarts.min.js"></script>
+    <script src="assets/vendor/quill/quill.js"></script>
+    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>

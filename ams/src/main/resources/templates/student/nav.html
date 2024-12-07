@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html class="loading" lang="en" data-textdirection="ltr"
+	xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<title>Vidyapith Attendance Management System</title>
+<link href="assets/img/favicon.png" rel="icon">
+<link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+	integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+	crossorigin="anonymous">
+
+<link href="https://fonts.gstatic.com" rel="preconnect">
+<link
+	href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+	rel="stylesheet">
+
+<link href="assets/vendor/bootstrap/css/bootstrap.min.css"
+	rel="stylesheet">
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.css"
+	rel="stylesheet">
+<link href="assets/vendor/boxicons/css/boxicons.min.css"
+	rel="stylesheet">
+<link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
+<link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+<link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+<link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+
+<link href="assets/css/style.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+
+
+	<header id='header' class='header fixed-top d-flex align-items-center'>
+
+
+
+		<div class='d-flex align-items-center justify-content-between'>
+
+			<a href='index.html' class='logo d-flex align-items-center'> <img
+				src='assets/img/logo.png' alt='GVP'><span
+				class='d-none d-lg-block'>GujaratVidyapith</span>
+
+			</a> <i class='fa fa-bars toggle-sidebar-btn'></i>
+		</div>
+
+
+		<nav class='header-nav ms-auto'>
+			<ul class='d-flex align-items-center'>
+
+				<li class="nav-item dropdown pe-3"><a
+					class="nav-link nav-profile d-flex align-items-center pe-0"
+					href="#" data-bs-toggle="dropdown"><img
+						th:src="@{${userDetails['addmission'].image}}" alt="Profile"
+						class="rounded-circle"> </a>
+					<ul
+						class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+						<li class='dropdown-header'>
+							<h6
+								th:text="${userDetails['addmission'].fname + ' ' + userDetails['addmission'].lname}"></h6>
+						</li>
+						<li>
+							<hr class='dropdown-divider'>
+						</li>
+
+
+						<li><a class='dropdown-item d-flex align-items-center'
+							href='#' data-bs-toggle="modal" data-bs-target="#profileModel"><i
+								class='fas fa-user-circle'></i><span>My Profile</span></a></li>
+
+						<li>
+							<hr class='dropdown-divider'>
+						</li>
+
+						<li><a class='dropdown-item d-flex align-items-center'
+							href="#" data-bs-toggle="modal"
+							data-bs-target="#editProfileModel"><i class='fas fa-user-cog'></i><span>Edit
+									Profile</span></a></li>
+
+						<li>
+							<hr class='dropdown-divider'>
+						</li>
+
+						<li><a class='dropdown-item d-flex align-items-center'
+							href="#" data-bs-toggle="modal"
+							data-bs-target="#changePasswordModel"><i
+								class='fas fa-user-secret'></i><span>Change Password</span></a></li>
+
+
+						<li>
+							<hr class='dropdown-divider'>
+						</li>
+
+
+						<li><a class='dropdown-item d-flex align-items-center'
+							href="../signout"><i class='fa fa-sign-out'></i><span>Sign
+									Out</span></a></li>
+
+					</ul></li>
+
+			</ul>
+		</nav>
+	</header>
+
+	<aside id='sidebar' class='sidebar'>
+		<ul class='sidebar-nav' id='sidebar-nav'>
+
+			<li class='nav-item'><a class='nav-link collapsed'
+				href='index.html'> <i class='fa fa-th-list'></i> <span>Dashboard</span>
+			</a></li>
+
+			<li class='nav-item'><a class='nav-link collapsed'
+				href='attendance.html'> <i class='fas fa-tasks'></i> <span>Attendance</span>
+			</a></li>
+
+			<li class='nav-item'><a class='nav-link collapsed'
+				href='schedules.html'> <i class='fa fa-calendar'></i> <span>Schedules</span>
+			</a></li>
+
+			<li class='nav-item'><a class='nav-link collapsed'
+				href='exam.html'> <i class='fas fa-book-reader'></i> <span>Exam</span>
+			</a></li>
+
+			<li class='nav-item'><a class='nav-link collapsed'
+				href='leave.html'> <i class='fa fa-id-badge'></i> <span>Leave</span>
+			</a></li>
+
+		</ul>
+	</aside>
+
+	<div class="modal fade" id="profileModel" tabindex="-1">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Profile Details</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<i class="fa fa-times"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="card-body pt-3">
+						<div class="row">
+							<div class="row justify-content-center">
+
+								<div class="profile-card mb-4">
+									<img th:src="@{${userDetails['addmission'].image}}"
+										alt="Profile" class="profile-img">
+									<h2
+										th:text="${userDetails['addmission'].fname + ' ' + userDetails['addmission'].lname}"></h2>
+								</div>
+
+
+								<div class="row">
+									<div class="col">
+										<h5 class="card-title">Profile Details</h5>
+									</div>
+								</div>
+								<hr class="divider">
+
+
+								<div class="row detail-row">
+									<div class="col-lg-4 col-md-4 label">Enrollment ID</div>
+									<div class="col-lg-8 col-md-8"
+										th:text="${userDetails['addmission'].entrollmentno}"></div>
+								</div>
+
+								<div class="row detail-row">
+									<div class="col-lg-4 col-md-4 label">Full Name</div>
+									<div class="col-lg-8 col-md-8"
+										th:text="${userDetails['addmission'].fname + ' ' + userDetails['addmission'].mname + ' ' + userDetails['addmission'].lname}"></div>
+								</div>
+
+								<div class="row detail-row">
+									<div class="col-lg-4 col-md-4 label">Program</div>
+									<div class="col-lg-8 col-md-8"
+										th:text="${userDetails['student'].program.program}"></div>
+								</div>
+
+								<div class="row detail-row">
+									<div class="col-lg-4 col-md-4 label">Semester</div>
+									<div class="col-lg-8 col-md-8"
+										th:text="${userDetails['student'].semester.semester}"></div>
+								</div>
+
+								<div class="row detail-row">
+									<div class="col-lg-4 col-md-4 label">Date of Birth</div>
+									<div class="col-lg-8 col-md-8"
+										th:text="${#dates.format(userDetails['addmission'].dob, 'dd/MM/yyyy')}"></div>
+
+								</div>
+
+								<div class="row detail-row">
+									<div class="col-lg-4 col-md-4 label">Contact Number</div>
+									<div class="col-lg-8 col-md-8"
+										th:text="${userDetails['addmission'].contactnumber}"></div>
+								</div>
+
+								<div class="row detail-row">
+									<div class="col-lg-4 col-md-4 label">Email</div>
+									<div class="col-lg-8 col-md-8"
+										th:text="${userDetails['addmission'].email}"></div>
+								</div>
+
+								<div class="row detail-row">
+									<div class="col-lg-4 col-md-4 label">Address</div>
+									<div class="col-lg-8 col-md-8"
+										th:text="${userDetails['addmission'].address}"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="modal fade" id="editProfileModel" tabindex="-1">
+		<div class="modal-dialog modal-lg modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Edit Profile</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<i class="fa fa-times"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form class="row mb-3" id="profileForm"
+						th:action="@{/updatetStudentProfile}" method="post"
+						onsubmit="return validateForm()" enctype="multipart/form-data">
+						<input type="hidden" id="editstudentid" name="studentid"
+							th:value="${userDetails['addmission'].studentid}" />
+						<div class="row mb-3">
+							<label for="profileImage"
+								class="col-md-4 col-lg-3 col-form-label"><i
+								class="fa fa-camera"></i>Profile Image</label>
+
+							<div class="col-md-8 col-lg-9">
+								<div class="profile-container" id="profileDropZone"
+									onclick="document.getElementById('profileImageInput').click();">
+									<i class="fa fa-camera"></i>
+									<p>Drag & drop your image here, or click to select</p>
+									<img th:src="@{${userDetails['addmission'].image}}" alt="Profile" class="profile-img" id="profileDisplay" />
+
+								</div>
+								<input type="file" name="profileImageInput"
+									id="profileImageInput" style="display: none;"
+									onchange="previewImage(event)">
+								<p id="profileImageError" class="error-message"></p>
+							</div>
+
+						</div>
+
+						<div class="row mb-3">
+							<label for="fullName" class="col-md-4 col-lg-3 col-form-label"><i
+								class="fas fa-user"></i>Full Name</label>
+							<div class="col-md-8 col-lg-9">
+								<div class="form-group d-flex justify-content-between">
+									<input name="fname" type="text" class="form-control"
+										id="editfname" style="width: 32.5%"
+										th:value="${userDetails['addmission'].fname}" /> <input
+										name="mname" type="text" class="form-control" id="editmname"
+										style="width: 32.5%"
+										th:value="${userDetails['addmission'].mname}" /> <input
+										name="lname" type="text" class="form-control" id="editlname"
+										style="width: 32.5%"
+										th:value="${userDetails['addmission'].lname}" />
+								</div>
+								<p id="editnameError" class="error-message"></p>
+							</div>
+
+
+							<label for="dateOfBirth" class="col-md-4 col-lg-3 col-form-label"><i
+								class="fas fa-calendar-alt"></i>Date Of Birth</label>
+							<div class="col-md-8 col-lg-9">
+								<input type="date" class="form-control" name="dob"
+									id="editdateOfBirth"
+									th:value="${#dates.format(userDetails['addmission'].dob, 'yyyy-MM-dd')}" />
+								<p id="editdobError" class="error-message"></p>
+							</div>
+							<label for="email" class="col-md-4 col-lg-3 col-form-label"><i
+								class="fas fa-envelope"></i>Email</label>
+							<div class="col-md-8 col-lg-9">
+								<input name="email" type="text" class="form-control"
+									id="editemail" th:value="${userDetails['addmission'].email}">
+								<p id="editemailError" class="error-message"></p>
+							</div>
+							<label for="contactNumber"
+								class="col-md-4 col-lg-3 col-form-label"><i
+								class="fas fa-phone-alt"></i>Phone</label>
+							<div class="col-md-8 col-lg-9">
+								<input name="contactNumber" type="text" class="form-control"
+									id="editcontactNumber"
+									th:value="${userDetails['addmission'].contactnumber}">
+								<p id="editcontactNoError" class="error-message"></p>
+							</div>
+							<label for="address" class="col-md-4 col-lg-3 col-form-label"><i
+								class="fas fa-map-marker-alt"></i>Address </label>
+							<div class="col-md-8 col-lg-9">
+								<textarea class="form-control" placeholder="Address"
+									name="address" id="editaddress" style="height: 100px;"
+									th:text="${userDetails['addmission'].address}"></textarea>
+								<p id="editaddressError" class="error-message"></p>
+							</div>
+						</div>
+						<div class="col-12">
+							<button type="submit" class="btn btn-custom"
+								style="width: 150px;">Save Changes</button>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="changePasswordModel" tabindex="-1">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Change Password</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<i class="fa fa-times"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form class="row mb-3" th:action="@{/changeStudentPassword}"
+						method="post" onsubmit="return validatePasswordForm()">
+						<input type="hidden" id="email" name="email"
+							th:value="${userDetails['addmission'].gvpemail}" />
+
+						<div class="col-md-12 mb-3">
+							<label for="oldpassword"><i class="fas fa-key"></i> Old
+								Password</label>
+							<div class="password-container">
+								<input type="password" class="form-control" id="oldpassword"
+									name="oldPassword" placeholder="Old Password"
+									onblur="validateOldPassword()" /> <i
+									class="fas fa-eye-slash toggle-password"
+									onclick="togglePasswordVisibility('oldpassword', this)"></i>
+							</div>
+							<p id="oldpasswordError" class="error-message"></p>
+						</div>
+
+						<div class="col-md-12 mb-3">
+							<label for="newpassword"><i class="fas fa-unlock-alt"></i>
+								New Password</label>
+							<div class="password-container">
+								<input type="password" class="form-control" id="newpassword"
+									name="newPassword" placeholder="New Password"
+									onblur="validateNewPassword()" /> <i
+									class="fas fa-eye-slash toggle-password"
+									onclick="togglePasswordVisibility('newpassword', this)"></i>
+							</div>
+							<p id="newpasswordError" class="error-message"></p>
+						</div>
+
+						<div class="col-md-12 mb-3">
+							<label for="confirmpassword"><i class="fas fa-lock"></i>
+								Confirm New Password</label>
+							<div class="password-container">
+								<input type="password" class="form-control" id="confirmpassword"
+									name="confirmpassword" placeholder="Confirm New Password"
+									onblur="validateConfirmPassword()" /> <i
+									class="fas fa-eye-slash toggle-password"
+									onclick="togglePasswordVisibility('confirmpassword', this)"></i>
+							</div>
+							<p id="confirmpasswordError" class="error-message"></p>
+						</div>
+
+						<div class="col-12">
+							<button type="submit" class="btn btn-custom">Change
+								Password</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<a href="#"
+		class="back-to-top d-flex align-items-center justify-content-center"><i
+		class="bi bi-arrow-up-short"></i></a>
+
+  
+	<script>
+	  document
+      .querySelector(".toggle-sidebar-btn")
+      .addEventListener("click", function () {
+        document.body.classList.toggle("toggle-sidebar");
+      });
+        
+
+        function togglePasswordVisibility(inputFieldId, iconElement) {
+            var passwordField = document.getElementById(inputFieldId);
+            var icon = iconElement;
+
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+                setTimeout(function () {
+                    passwordField.type = "password";
+                    icon.classList.remove("fa-eye");
+                    icon.classList.add("fa-eye-slash");
+                }, 1500);
+            } else {
+                passwordField.type = "password";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            }
+        }
+
+
+        function setActiveNav() {
+            const currentUrl = window.location.href;
+            const navItems = document.querySelectorAll('.sidebar-nav .nav-link');
+
+            navItems.forEach((item) => {
+                if (currentUrl.includes(item.getAttribute('href'))) {
+                    item.classList.remove('collapsed');
+                    item.classList.add('active');
+                    const parent = item.closest('.nav-item');
+                    if (parent && parent.classList.contains('nav-item')) {
+                        parent.classList.add('active');
+                    }
+                }
+            });
+        }
+
+        window.onload = setActiveNav;
+
+
+        function previewImage(event) {
+            const file = event.target.files[0]; // Get the selected file
+            const reader = new FileReader();
+            reader.onload = function () {
+                const output = document.getElementById('profileDisplay'); // Image display element
+                output.src = reader.result; // Set the image source to the selected file
+                output.style.display = 'block'; // Show the image
+                document.querySelector('.fa-camera').style.display = 'none'; // Hide the camera icon
+                document.querySelector('.profile-container p').style.display = 'none'; // Hide the placeholder text
+            }
+            reader.readAsDataURL(file); // Read the file as a Data URL
+        }
+
+        // For drag-and-drop image selection
+        const dropZone = document.getElementById('profileDropZone');
+
+        dropZone.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.add('dragover'); // Add dragover class for styling
+        });
+
+        dropZone.addEventListener('dragleave', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('dragover'); // Remove dragover class
+        });
+
+        dropZone.addEventListener('drop', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('dragover'); // Remove dragover class after drop
+            const files = e.dataTransfer.files; // Get the dropped files
+            document.getElementById('profileImageInput').files = files; // Set files to input field
+            previewImage({ target: { files: files } }); 
+        });
+
+    </script>
+
+	<script>
+      function validateOldPassword() {
+        const oldPasswordField = document.getElementById("oldpassword");
+        const oldPasswordValue = oldPasswordField.value.trim();
+        const oldPasswordError = document.getElementById("oldpasswordError");
+
+        if (!oldPasswordValue) {
+          oldPasswordError.textContent = "Old Password cannot be empty";
+          return false;
+        }
+
+        fetch("/validateOldPassword", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
+            email: document.getElementById("email").value,
+            oldPassword: oldPasswordValue,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (!data.isValid) {
+              oldPasswordError.textContent = "Old password is incorrect.";
+            } else {
+              oldPasswordError.textContent = "";
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+
+      function validateNewPassword() {
+        const newPasswordField = document.getElementById("newpassword");
+        const newPasswordValue = newPasswordField.value.trim();
+        const newPasswordError = document.getElementById("newpasswordError");
+
+        const passwordRegex =
+          /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,}$/;
+
+        if (!newPasswordValue) {
+          newPasswordError.textContent = "Please enter valid password";
+          return false;
+        } else if (!passwordRegex.test(newPasswordValue)) {
+          newPasswordError.textContent =
+            "Password must be at least 8 characters long and include special character, alphabet, and number";
+          return false;
+        } else {
+          newPasswordError.textContent = "";
+        }
+
+        return true;
+      }
+
+      function validateConfirmPassword() {
+        const confirmPasswordField = document.getElementById("confirmpassword");
+        const confirmPasswordValue = confirmPasswordField.value.trim();
+        const confirmPasswordError = document.getElementById(
+          "confirmpasswordError"
+        );
+        const newPasswordValue = document
+          .getElementById("newpassword")
+          .value.trim();
+
+        if (!confirmPasswordValue) {
+          confirmPasswordError.textContent = "Please enter valid password";
+          return false;
+        }
+
+        if (newPasswordValue !== confirmPasswordValue) {
+          confirmPasswordError.textContent = "Passwords do not match";
+          return false;
+        } else {
+          confirmPasswordError.textContent = "";
+        }
+
+        return true;
+      }
+
+      function validatePasswordForm() {
+        let isValid = true;
+
+        validateOldPassword();
+        if (document.getElementById("oldpasswordError").textContent)
+          isValid = false;
+
+        validateNewPassword();
+        if (document.getElementById("newpasswordError").textContent)
+          isValid = false;
+
+        validateConfirmPassword();
+        if (document.getElementById("confirmpasswordError").textContent)
+          isValid = false;
+
+        return isValid;
+      }
+
+      document
+        .getElementById("oldpasswordError")
+        .addEventListener("blur", validateOldPassword);
+      document
+        .getElementById("newpasswordError")
+        .addEventListener("blur", validateNewPassword);
+      document
+        .getElementById("confirmpasswordError")
+        .addEventListener("blur", validateConfirmPassword);
+    </script>
+
+
+	<script>
+
+  function validateemail() {
+    const email = document.getElementById("editemail").value;
+    const errorElement = document.getElementById("editemailError");
+    if (email.length < 5 || email.length > 255 || !/\S+@\S+\.\S+/.test(email)) {
+      errorElement.textContent = "Please enter a valid email address";
+    } else {
+      errorElement.textContent = "";
+    }
+  }
+
+
+  function validateaddress() {
+    const address = document.getElementById("editaddress").value;
+    const errorElement = document.getElementById("editaddressError");
+    if (address.length < 10 || address.length > 255) {
+      errorElement.textContent = "Please enter a valid address";
+    } else {
+      errorElement.textContent = "";
+    }
+  }
+
+ 
+  function validatephone() {
+    const phone = document.getElementById("editcontactNumber").value;
+    const errorElement = document.getElementById("editcontactNoError");
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(phone)) {
+      errorElement.textContent = "Please enter a valid contact number";
+    } else {
+      errorElement.textContent = "";
+    }
+  }
+
+ 
+  function validatename() {
+    const fname = document.getElementById("editfname").value;
+    const mname = document.getElementById("editmname").value;
+    const lname = document.getElementById("editlname").value;
+    const errorElement = document.getElementById("editnameError");
+    if (
+      fname.length < 2 ||
+      fname.length > 255 ||
+      mname.length < 2 ||
+      mname.length > 255 ||
+      lname.length < 2 ||
+      lname.length > 255
+    ) {
+      errorElement.textContent = "Please enter a valid name";
+      return false;
+    } else {
+      errorElement.textContent = "";
+      return true;
+    }
+  }
+
+
+  function validatedob() {
+    const dob = document.getElementById("editdateOfBirth").value;
+    const errorElement = document.getElementById("editdobError");
+    const cutoffDate = new Date("2003-01-01");
+    const dobDate = new Date(dob);
+
+    if (!dob) {
+      errorElement.textContent = "Please enter a valid date of birth";
+    } else if (dobDate >= cutoffDate) {
+      errorElement.textContent = "Please enter a valid date of birth";
+    } else {
+      errorElement.textContent = "";
+    }
+  }
+
+
+  function validateprofileimage() {
+      const profileImage =
+        document.getElementById("profileImageInput").files[0];
+      const errorElement = document.getElementById("profileImageError");
+      if (profileImage && profileImage.size > 2 * 1024 * 1024) {
+        errorElement.textContent = "Please enter valid profile image";
+      } else {
+        errorElement.textContent = "";
+      }
+    }
+
+  
+  function validateForm() {
+    let isValid = true;
+
+  
+    if (!validatename()) isValid = false;
+    if (document.getElementById("editnameError").textContent) isValid = false;
+
+    validateemail();
+    if (document.getElementById("editemailError").textContent) isValid = false;
+
+    validateaddress();
+    if (document.getElementById("editaddressError").textContent) isValid = false;
+
+    validatephone();
+    if (document.getElementById("editcontactNoError").textContent) isValid = false;
+
+    validatedob();
+    if (document.getElementById("editdobError").textContent) isValid = false;
+
+    validateprofileimage();
+    if (document.getElementById("profileImageError").textContent) isValid = false;
+
+    return isValid;
+  }
+
+
+  document.getElementById("editemail").addEventListener("blur", validateemail);
+  document.getElementById("editaddress").addEventListener("blur", validateaddress);
+  document.getElementById("editcontactNumber").addEventListener("blur", validatephone);
+  document.getElementById("editfname").addEventListener("blur", validatename);
+  document.getElementById("editlname").addEventListener("blur", validatename);
+  document.getElementById("editdateOfBirth").addEventListener("blur", validatedob);
+  document.getElementById("profileImageInput").addEventListener("change", validateprofileimage);
+</script>
+
+
+	<script
+		src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script
+		src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+	<script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+	<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="assets/vendor/chart.js/chart.umd.js"></script>
+	<script src="assets/vendor/echarts/echarts.min.js"></script>
+	<script src="assets/vendor/quill/quill.js"></script>
+	<script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+	<script src="assets/vendor/tinymce/tinymce.min.js"></script>
+	<script src="assets/vendor/php-email-form/validate.js"></script>
+
+
+	<script src="assets/js/main.js"></script>
+
+
+</body>
+
+</html>

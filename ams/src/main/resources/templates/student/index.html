@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+
+<html class="loading" lang="en" data-textdirection="ltr"
+	xmlns:th="http://www.thymeleaf.org">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Attendance Management System</title>
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+      rel="stylesheet">
+
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+    <link href="assets/css/style.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+<div th:replace="~{student/nav :: body}"></div>
+    <main id="main" class="main">
+
+      <div class="pagetitle">
+        <h1>Dashboard</h1>
+        <nav>
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+            <li class="breadcrumb-item active">Dashboard</li>
+          </ol>
+        </nav>
+      </div>
+
+      <section class="section dashboard">
+        <div class="row">
+          <div class="col-lg-8">
+            <div class="row">
+              <div class="col-4">
+                <div class="card info-card attendance-card">
+
+
+                  <div class="card-body">
+                    <h5 class="card-title">Present<span> | May 2024</span></h5>
+
+                    <div class="d-flex align-items-center">
+                      <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="fas fa-id-card text-success"></i>
+                      </div>
+                      <div class="ps-3">
+                        <h6 class="text-success">95%</h6>
+                        <span class="text-muted small pt-2 ps-1">90% April 2024</span>
+
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="card info-card attendance-card">
+
+
+                  <div class="card-body">
+                    <h5 class="card-title">Absent<span> | May 2024</span></h5>
+
+                    <div class="d-flex align-items-center">
+                      <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="far fa-id-card text-danger"></i>
+                      </div>
+                      <div class="ps-3">
+                        <h6 class="text-danger">3%</h6>
+                        <span class="text-muted small pt-2 ps-1">10% April 2024</span>
+
+
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="card info-card attendance-card">
+
+
+                  <div class="card-body">
+                    <h5 class="card-title">Leave<span> | May 2024</span></h5>
+
+                    <div class="d-flex align-items-center">
+                      <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="fas fa-user-clock text-warning"></i>
+                      </div>
+                      <div class="ps-3">
+                        <h6 class="text-warning">2%</h6>
+                        <span class="text-muted small pt-2 ps-1">0% April 2024</span>
+
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="col-lg-12">
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">Progress Report <span>| Weekly Exam</span></h5>
+                    <div class="filter">
+                      <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                      <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                        <li><a class="dropdown-item" href="#" id="downloadPNG">Download as PNG</a></li>
+                        <li><a class="dropdown-item" href="#" id="downloadPDF">Download as PDF</a></li>
+                      </ul>
+                    </div>
+                    <div id="barChart"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="card recent-attendance overflow-auto">
+
+                  <div class="card-body">
+                    <h5 class="card-title">Results <span>| Weekly Exam</span></h5>
+
+                    <table class="table-custom">
+                      <thead>
+                        <tr>
+                          <th scope="col">Subject Code</th>
+                          <th scope="col">Subject Name</th>
+                          <th scope="col">Date of Exam</th>
+                          <th scope="col">Obtained Marks</th>
+                          <th scope="col">Total Marks</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>MCA-201 (T)</td>
+                          <td>Mobile Application Development</a></td>
+                          <td style="text-align: center;">20-05-2024</td>
+                          <td style="text-align: center;">15</td>
+                          <td style="text-align: center;">20</td>
+                        </tr>
+                        <tr>
+                          <td>MCA-202 (T)</td>
+                          <td>Web Technology</a></td>
+                          <td style="text-align: center;">21-05-2024</td>
+                          <td style="text-align: center;">17</td>
+                          <td style="text-align: center;">20</td>
+                        </tr>
+                        <tr>
+                          <td>MCA-203</td>
+                          <td>Computer Network</a></td>
+                          <td style="text-align: center;">22-05-2024</td>
+                          <td style="text-align: center;">16</td>
+                          <td style="text-align: center;">20</td>
+                        </tr>
+                        <tr>
+                          <td>MCA-204 (T)</td>
+                          <td>Software Design Pattern</a></td>
+                          <td style="text-align: center;">23-05-2024</td>
+                          <td style="text-align: center;">17</td>
+                          <td style="text-align: center;">20</td>
+                        </tr>
+                        <tr>
+                          <td>MCA-205</td>
+                          <td>Software Engineering</a></td>
+                          <td style="text-align: center;">24-05-2024</td>
+                          <td style="text-align: center;">14</td>
+                          <td style="text-align: center;">20</td>
+                        </tr>
+                        <tr>
+                          <td>MCA-201 (P)</td>
+                          <td>Mobile Application Development</a></td>
+                          <td style="text-align: center;">25-05-2024</td>
+                          <td style="text-align: center;">19</td>
+                          <td style="text-align: center;">20</td>
+                        </tr>
+                        <tr>
+                          <td>MCA-202 (P)</td>
+                          <td>Web Technology</a></td>
+                          <td style="text-align: center;">27-05-2024</td>
+                          <td style="text-align: center;">18</td>
+                          <td style="text-align: center;">20</td>
+                        </tr>
+                        <tr>
+                          <td>MCA-204 (P)</td>
+                          <td>Software Design Pattern</a></td>
+                          <td style="text-align: center;">28-05-2024</td>
+                          <td style="text-align: center;">17</td>
+                          <td style="text-align: center;">20</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Attendance Report <span>| May 2024</span></h5>
+                <div class="filter">
+                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                    <li><a class="dropdown-item" href="#" id="downloadAsPNG">Download as PNG</a></li>
+                    <li><a class="dropdown-item" href="#" id="downloadAsPDF">Download as PDF</a></li>
+                  </ul>
+                </div>
+
+                <div id="areaChart"></div>
+              </div>
+
+            </div>
+            <div class="card">
+
+
+              <div class="card-body pb-0">
+                <h5 class="card-title">Schedule <span>| 28-05-2024</span></h5>
+
+                <div class="schedule">
+                  <div class="post-item">
+                    <div>
+                      <h6>MCA-201(T) | Mobile Application Development</h6>
+                      <span>11:30 AM to 12:30 PM</span>
+                    </div>
+                  </div>
+                  <hr class='divider'>
+                  <div class="post-item">
+                    <div>
+                      <h6>MCA-202(T) | Web Technology</h6>
+                      <span>12:30 PM to 1:30 PM</span>
+                    </div>
+                  </div>
+                  <hr class='divider'>
+                  <div class="post-item">
+                    <div>
+                      <h6>MCA-203 | Computer Network</h6>
+                      <span>1:30 PM to 2:30 PM</span>
+                    </div>
+                  </div>
+                  <hr class='divider'>
+                  <div class="post-item">
+                    <div>
+                      <h6>MCA-205 | Software Engineering</h6>
+                      <span>2:30 PM to 3:00 PM</span>
+                    </div>
+                  </div>
+                  <hr class='divider'>
+                  <div class="post-item">
+                    <div>
+                      <h6>MCA-204(P) | Software Design Pattern</h6>
+                      <span>3:00 PM to 4:00 PM</span>
+                    </div>
+                  </div>
+                  <hr class='divider'>
+                  <div class="post-item">
+                    <div>
+                      <h6>MCA-204(P) | Software Design Pattern</h6>
+                      <span>4:00 PM to 5:00 PM</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+      </section>
+
+    </main>
+
+    <script>
+      // Bar Chart for Weekly Exam Report
+      document.addEventListener("DOMContentLoaded", () => {
+        const options = {
+          series: [
+            {
+              data: [85, 90, 78, 88, 76.5, 75, 87, 72.5],
+            },
+          ],
+          chart: {
+            type: "bar",
+            width: 700,
+            toolbar: {
+              show: true,
+              tools: {
+                download: false,
+              },
+            },
+          },
+          plotOptions: {
+            bar: {
+              borderRadius: 1,
+              horizontal: false,
+              columnWidth: "50%",
+            },
+          },
+          colors: "#937765",
+          dataLabels: {
+            enabled: false,
+            style: {
+              colors: ["#f5f5f5"],
+            },
+          },
+          xaxis: {
+            categories: [
+              "MCA201(T)",
+              "MCA202(T)",
+              "MCA203",
+              "MCA204(T)",
+              "MCA205",
+              "MCA201(P)",
+              "MCA202(P)",
+              "MCA204(P)",
+            ],
+          },
+          tooltip: {
+            theme: "dark",
+            bodyColor: "#fff",
+            marker: {
+              show: true,
+            },
+            x: {
+              show: true,
+              formatter: function (val) {
+                return "Subject: " + val;
+              },
+            },
+            y: {
+              title: {
+                formatter: function () {
+                  return "Percentage";
+                },
+              },
+            },
+          },
+        };
+
+        const chart = new ApexCharts(document.querySelector("#barChart"), options);
+        chart.render();
+
+        document.querySelector("#downloadPNG").addEventListener("click", () => {
+          chart.dataURI().then(({ imgURI }) => {
+            const link = document.createElement("a");
+            link.href = imgURI;
+            link.download = "weekly-may2024.png";
+            link.click();
+          });
+        });
+
+        document.querySelector("#downloadPDF").addEventListener("click", () => {
+          chart.dataURI().then(({ imgURI }) => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.addImage(imgURI, "PNG", 15, 40, 180, 160);
+            doc.save("weekly-may2024.pdf");
+          });
+        });
+      });
+
+      // Area Chart For Attendance Report
+      document.addEventListener("DOMContentLoaded", () => {
+        const series = {
+          data: [85, 90, 99, 100, 82, 85, 90, 79],
+          labels: [
+            "MCA201(T)",
+            "MCA202(T)",
+            "MCA203",
+            "MCA204(T)",
+            "MCA205",
+            "MCA201(P)",
+            "MCA202(P)",
+            "MCA204(P)",
+          ],
+        };
+
+        const options = {
+          series: [
+            {
+              name: "Attendance",
+              data: series.data,
+            },
+          ],
+          chart: {
+            type: "area",
+            height: 350,
+            zoom: {
+              enabled: false,
+            },
+            toolbar: {
+              show: false,
+            },
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          stroke: {
+            curve: "smooth",
+          },
+          xaxis: {
+            categories: series.labels,
+          },
+          yaxis: {
+            opposite: false,
+          },
+          legend: {
+            horizontalAlign: "left",
+          },
+          tooltip: {
+            theme: "dark",
+          },
+          colors: ["#937765"],
+        };
+
+        const chart = new ApexCharts(document.querySelector("#areaChart"), options);
+        chart.render();
+
+        document.querySelector("#downloadAsPNG").addEventListener("click", () => {
+          chart.dataURI().then(({ imgURI }) => {
+            const link = document.createElement("a");
+            link.href = imgURI;
+            link.download = "attendance-may2024.png";
+            link.click();
+          });
+        });
+
+        document.querySelector("#downloadAsPDF").addEventListener("click", () => {
+          chart.dataURI().then(({ imgURI }) => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.addImage(imgURI, "PNG", 15, 40, 180, 160);
+            doc.save("attendance-may2024.pdf");
+          });
+        });
+      });
+
+    </script>
+
+    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="assets/vendor/echarts/echarts.min.js"></script>
+    <script src="assets/vendor/quill/quill.js"></script>
+    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+    <script src="assets/js/main.js"></script>
+
+  </body>
+
+</html>

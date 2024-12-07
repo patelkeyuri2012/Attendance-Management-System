@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html class="loading" lang="en" data-textdirection="ltr"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<title>Attendance Management System</title>
+<link href="assets/img/favicon.png" rel="icon" />
+<link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
+
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+	integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+	crossorigin="anonymous" />
+
+<link href="https://fonts.gstatic.com" rel="preconnect" />
+<link
+	href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+	rel="stylesheet" />
+
+<link href="assets/vendor/bootstrap/css/bootstrap.min.css"
+	rel="stylesheet" />
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.css"
+	rel="stylesheet" />
+<link href="assets/vendor/boxicons/css/boxicons.min.css"
+	rel="stylesheet" />
+<link href="assets/vendor/quill/quill.snow.css" rel="stylesheet" />
+<link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet" />
+<link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet" />
+<link href="assets/vendor/simple-datatables/style.css" rel="stylesheet" />
+
+<link href="assets/css/style.css" rel="stylesheet" />
+
+<script>
+      function preventBack() {
+        window.history.forward();
+      }
+
+      setTimeout("preventBack()", 0);
+
+      window.onunload = function () {
+        null;
+      };
+    </script>
+</head>
+
+<body>
+	<div th:replace="~{admin/nav :: body}"></div>
+	<main id="main" class="main">
+		<div class="pagetitle">
+			<h1>Teacher</h1>
+			<nav>
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="index.html">Home</a></li>
+					<li class="breadcrumb-item active">Teacher</li>
+				</ol>
+			</nav>
+		</div>
+
+		<section class="teacher section">
+			<div class="col-lg-12">
+				<div class="card">
+					<div class="card-body">
+						<div class="d-flex justify-content-between align-items-center">
+							<h5 class="card-title" data-bs-toggle="modal"
+								data-bs-target="#addTeachermodel" style="cursor: pointer">
+								Add Teacher</h5>
+						</div>
+					</div>
+				</div>
+				<div class="card" style="display: none">
+					<div class="card-body">
+						<div class="d-flex justify-content-between align-items-center">
+							<table class="table-custom registrations-table">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Email</th>
+										<th scope="col">Contact No</th>
+										<th scope="col">Qualification</th>
+										<th scope="col">Faculty</th>
+										<th scope="col">Department</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="registration : ${registrations}"
+										data-table-type="registration">
+										<td th:text="${registration.teacherid}" style="display: none"></td>
+										<td
+											th:text="${registration.fname} + ' ' + ${registration.mname} + ' ' + ${registration.lname}"></td>
+										<td th:text="${registration.personalemail}"></td>
+										<td th:text="${registration.contactnumber}"></td>
+										<td th:text="${registration.qualification}"></td>
+										<td th:text="${registration.facultyid.faculty}"
+											th:attr="data-facultyid=${registration.facultyid.facultyid}"></td>
+										<td th:text="${registration.departmentid.department}"
+											th:attr="data-departmentid=${registration.departmentid.departmentid}"></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="card">
+					<div class="card-body">
+						<div class="d-flex justify-content-between align-items-center">
+							<table class="table-custom">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Email</th>
+										<th scope="col">Contact No</th>
+										<th scope="col">Qualification</th>
+										<th scope="col">Faculty</th>
+										<th scope="col">Department</th>
+										<th scope="col">Program</th>
+										<th scope="col">Semester</th>
+										<th scope="col">Subject</th>
+										<th scope="col">Active</th>
+										<th scope="col" style="width: 100px"></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="teacher : ${teachers}">
+										<td th:text="${teacher.registrationid}" style="display: none"></td>
+										<td
+											th:text="${teacher.fname} + ' ' + ${teacher.mname} + ' ' + ${teacher.lname}"></td>
+										<td th:text="${teacher.email}"></td>
+										<td th:text="${teacher.contactno}"></td>
+										<td th:text="${teacher.qualification}"></td>
+
+										<td th:text="${teacher.faculty.faculty}"
+											th:attr="data-facultyid=${teacher.faculty.facultyid}"></td>
+
+										<td th:text="${teacher.department.department}"
+											th:attr="data-departmentid=${teacher.department.departmentid}"></td>
+
+										<td>
+											<ul th:if="${not #lists.isEmpty(teacher.programs)}"
+												class="list-unstyled">
+												<li th:each="program : ${teacher.programs}"
+													th:text="'- ' + ${program.program}"
+													th:attr="data-programid=${program.programid}"></li>
+											</ul> <span th:if="${#lists.isEmpty(teacher.programs)}">No
+												programs</span>
+										</td>
+
+										<td>
+											<ul th:if="${not #lists.isEmpty(teacher.semesters)}"
+												class="list-unstyled">
+												<li th:each="semester : ${teacher.semesters}"
+													th:text="'- ' + ${semester.semester}"
+													th:attr="data-semesterid=${semester.semesterid}"></li>
+											</ul> <span th:if="${#lists.isEmpty(teacher.semesters)}">No
+												semesters</span>
+										</td>
+
+										<td>
+											<ul th:if="${not #lists.isEmpty(teacher.subjects)}"
+												class="list-unstyled">
+												<li th:each="subject : ${teacher.subjects}"
+													th:text="'- ' + ${subject.subject}"
+													th:attr="data-subjectid=${subject.subjectid}"></li>
+											</ul> <span th:if="${#lists.isEmpty(teacher.subjects)}">No
+												subjects</span>
+										</td>
+
+										<td><span class="badge badge-success"
+											th:if="${teacher.active}">YES</span> <span
+											class="badge badge-danger" th:unless="${teacher.active}">NO</span>
+										</td>
+										<td><i class="fas fa-edit" data-bs-toggle="modal"
+											th:data-teacherid="${teacher.teacherid}"
+											data-bs-target="#editteacherModal"></i> <i
+											class="fas fa-trash-alt" data-bs-toggle="modal"
+											th:data-teacherid="${teacher.teacherid}"
+											data-bs-target="#deleteteacherModal"></i></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<div class="modal fade" id="addTeachermodel" tabindex="-1">
+		<div class="modal-dialog modal-dialog modal-lg modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Add Teacher</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<i class="fa fa-times"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="form-container">
+						<form id="teacherForm" th:action="@{/addTeacher}" method="post"
+							onsubmit="return validateForm('add')">
+							<div class="form-group">
+								<label for="registrationid" class="col-md-12 mb-3"><i
+									class="fa fa-fax"></i> Teacher ID</label> <input type="number"
+									id="registrationid" name="registrationid" min="0" step="1" />
+								<p id="registrationIdError" class="error-message"></p>
+							</div>
+
+							<div class="form-group">
+								<label for="name" class="col-md-12 mb-3"><i
+									class="fas fa-user"></i> Name</label> <input type="text"
+									placeholder="First Name" id="fname" name="fname"
+									style="width: 32.5%; display: inline-block" /> <input
+									type="text" placeholder="Middle Name" id="mname" name="mname"
+									style="width: 32.5%; display: inline-block" /> <input
+									type="text" placeholder="Last Name" id="lname" name="lname"
+									style="width: 32.5%; display: inline-block" />
+								<p id="nameError" class="error-message"></p>
+							</div>
+							<div class="form-group">
+								<label for="email" class="col-md-12 mb-3"><i
+									class="fas fa-envelope"></i> Email</label> <input type="email"
+									id="email" name="email" />
+								<p id="emailError" class="error-message"></p>
+							</div>
+							<div class="form-group">
+								<label for="contactNo" class="col-md-12 mb-3"><i
+									class="fas fa-phone-alt"></i> Contact No</label> <input type="text"
+									id="contactNo" name="contactNo" />
+								<p id="contactNoError" class="error-message"></p>
+							</div>
+							<div class="form-group">
+								<label for="qualification" class="col-md-12 mb-3"><i
+									class="fa fa-address-card"></i> Qualification</label> <input
+									type="text" id="qualification" name="qualification" />
+								<p id="qualificationError" class="error-message"></p>
+							</div>
+							<div class="form-group">
+								<label for="faculty" class="col-md-12 mb-3"><i
+									class="fas fa-city"></i> Faculty</label> <select id="faculty"
+									name="faculty">
+									<option value="">Select Faculty</option>
+									<option th:each="faculty : ${faculties}"
+										th:if="${faculty.active}" th:value="${faculty.facultyid}"
+										th:text="${faculty.faculty}"></option>
+								</select> <input type="hidden" id="facultyid" name="facultyid" />
+								<p id="facultyError" class="error-message"></p>
+							</div>
+							<div class="form-group">
+								<label for="department" class="col-md-12 mb-3"><i
+									class="fas fa-building"></i> Department</label> <select id="department"
+									name="department">
+									<option value="">Select Department</option>
+								</select>
+								<p id="departmentError" class="error-message"></p>
+							</div>
+
+							<div class="form-group" id="programContainer"
+								style="display: none">
+								<label for="program" class="col-md-12"><i
+									class="fas fa-graduation-cap"></i> Program</label>
+								<div id="programList" class="custom-checkbox"
+									style="margin-bottom: 15px"></div>
+								<p id="programError" class="error-message"></p>
+							</div>
+							<div class="form-group" id="semesterContainer"
+								style="display: none">
+								<label for="semester" class="col-md-12"><i
+									class="fa fa-book"></i> Semester</label>
+								<div id="semesterList" class="custom-checkbox"
+									style="margin-bottom: 15px"></div>
+								<p id="semesterError" class="error-message"></p>
+							</div>
+							<div class="form-group" id="subjectContainer"
+								style="display: none">
+								<label for="subjects" class="col-md-12"><i
+									class="fas fa-book-open"></i> Subject</label>
+								<div id="subjectList" class="custom-checkbox"></div>
+								<p id="subjectError" class="error-message"></p>
+							</div>
+							<div class="form-group">
+								<div class="custom-checkbox"
+									style="margin: auto; justify-content: right; align-items: center; display: flex;">
+									<input type="checkbox" id="active" name="active" checked /> <label
+										for="active" class="checkbox-icon"></label> <label
+										for="active" style="font-size: 16px">Active</label>
+								</div>
+							</div>
+							<input type="hidden" name="createdBy" id="createdBy"
+								th:value="${userDetails.adminid}" /> <input type="hidden"
+								name="modifiedBy" id="modifiedBy"
+								th:value="${userDetails.adminid}" />
+							<div class="form-group mt-3">
+								<button type="submit" class="btn-submit">Add Teacher</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="editteacherModal" tabindex="-1">
+		<div class="modal-dialog modal-dialog modal-lg modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Edit Teacher</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<i class="fa fa-times"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="form-container">
+						<form id="editteacherForm" th:action="@{/updateTeacher}"
+							method="post" onsubmit="return validateForm('edit')">
+							<input type="hidden" id="editteacherid" name="teacherid" />
+							<div class="form-group">
+								<label for="editregistrationid" class="col-md-12 mb-3"><i
+									class="fa fa-fax"></i> Teacher ID</label> <input type="text"
+									id="editregistrationid" name="registrationid" disabled />
+								<p id="editregistrationIdError" class="error-message"></p>
+							</div>
+							<div class="form-group">
+								<label for="editname" class="col-md-12 mb-3"><i
+									class="fas fa-user"></i> Name</label> <input type="text"
+									placeholder="First Name" id="editfname" name="fname"
+									style="width: 32.5%; display: inline-block" /> <input
+									type="text" placeholder="Middle Name" id="editmname"
+									name="mname" style="width: 32.5%; display: inline-block" /> <input
+									type="text" placeholder="Last Name" id="editlname" name="lname"
+									style="width: 32.5%; display: inline-block" />
+								<p id="editnameError" class="error-message"></p>
+							</div>
+							<div class="form-group">
+								<label for="editemail" class="col-md-12 mb-3"><i
+									class="fas fa-envelope"></i> Email</label> <input type="email"
+									id="editemail" name="email" />
+								<p id="editemailError" class="error-message"></p>
+							</div>
+							<div class="form-group">
+								<label for="editcontactNo" class="col-md-12 mb-3"><i
+									class="fas fa-phone-alt"></i> Contact No</label> <input type="text"
+									id="editcontactNo" name="contactNo" />
+								<p id="editcontactNoError" class="error-message"></p>
+							</div>
+							<div class="form-group">
+								<label for="editqualification" class="col-md-12 mb-3"><i
+									class="fa fa-address-card"></i> Qualification</label> <input
+									type="text" id="editqualification" name="qualification" />
+								<p id="editqualificationError" class="error-message"></p>
+							</div>
+							<div class="form-group">
+								<label for="editfacultyName" class="col-md-12 mb-3"><i
+									class="fas fa-city"></i> Faculty</label> <select id="editfacultyName"
+									name="faculty" onchange="loadDepartments(loadPrograms)">
+									<option value="">Select Faculty</option>
+									<option th:each="faculty : ${faculties}"
+										th:if="${faculty.active}" th:value="${faculty.facultyid}"
+										th:text="${faculty.faculty}"></option>
+								</select> <input type="hidden" id="editfaculty" name="facultyid" />
+								<p id="editfacultyError" class="error-message"></p>
+							</div>
+
+							<div class="form-group">
+								<label for="editdepartmentName" class="col-md-12 mb-3"><i
+									class="fas fa-building"></i> Department</label> <select
+									id="editdepartmentName" name="department"
+									onchange="loadPrograms(loadSemesters)">
+									<option value="">Select Department</option>
+								</select> <input type="hidden" id="editdepartment" name="departmentid" />
+								<p id="editdepartmentError" class="error-message"></p>
+							</div>
+
+							<div class="form-group">
+								<label class="col-md-12"><i
+									class="fas fa-graduation-cap"></i> Program</label>
+								<div id="editprogramContainer" class="custom-checkbox"></div>
+								<p id="editprogramError" class="error-message"></p>
+							</div>
+
+							<div class="form-group">
+								<label class="col-md-12"><i class="fa fa-book"></i>
+									Semester</label>
+								<div id="editsemesterContainer" class="custom-checkbox"></div>
+								<p id="editsemesterError" class="error-message"></p>
+							</div>
+
+							<div class="form-group">
+								<label class="col-md-12"><i class="fas fa-book-open"></i>
+									Subject</label>
+								<div id="editsubjectContainer" class="custom-checkbox"></div>
+								<p id="editsubjectError" class="error-message"></p>
+							</div>
+
+							<div class="form-group">
+								<div class="custom-checkbox"
+									style="margin: auto; justify-content: right; align-items: center; display: flex;">
+									<input type="checkbox" id="editactive" name="active" /> <label
+										for="editactive" class="checkbox-icon"></label> <label
+										for="editactive" style="font-size: 16px">Active</label>
+								</div>
+							</div>
+
+							<input type="hidden" name="modifiedBy" id="editmodifiedBy"
+								th:value="${userDetails.adminid}" />
+							<div class="form-group mt-3">
+								<button type="submit" class="btn-submit">Edit Teacher</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="deleteteacherModal" tabindex="-1">
+		<div class="modal-dialog modal-confirm">
+			<div class="modal-content">
+				<div class="modal-header flex-column">
+					<h4>Are you sure?</h4>
+				</div>
+				<div class="modal-body">
+					<p>
+						Do you really want to delete this teacher?<br /> This process
+						cannot be undone.
+					</p>
+				</div>
+				<div class="modal-footer justify-content-center">
+					<form id="deleteteacherForm" th:action="@{/deleteTeachers}"
+						method="post">
+						<input type="hidden" id="deleteteacherid" name="teacherId" />
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">Cancel</button>
+						<button type="button" class="btn btn-danger"
+							onclick="deleteTeacher()">Delete</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+	<script>
+      $(document).ready(function () {
+        $("#faculty").change(function () {
+          var facultyId = $(this).val();
+          var departmentDropdown = $("#department");
+
+          if (facultyId) {
+            $.ajax({
+              type: "GET",
+              url: "/api/departments/" + facultyId,
+              success: function (data) {
+                departmentDropdown.empty();
+                departmentDropdown.append(
+                  '<option value="">Select Department</option>'
+                );
+                $.each(data, function (index, department) {
+                  departmentDropdown.append(
+                    '<option value="' +
+                      department.departmentid +
+                      '">' +
+                      department.department +
+                      "</option>"
+                  );
+                });
+                departmentDropdown.prop("disabled", false);
+              },
+              error: function () {
+                console.error("Error fetching departments");
+              },
+            });
+          } else {
+            departmentDropdown.empty();
+            departmentDropdown.append(
+              '<option value="">Select Faculty first</option>'
+            );
+            departmentDropdown.prop("disabled", true);
+          }
+        });
+
+        $("#department").change(function () {
+          var departmentId = $(this).val();
+
+          if (departmentId) {
+            $.ajax({
+              type: "GET",
+              url: "/api/programs/" + departmentId,
+              success: function (data) {
+                $("#programList").empty();
+                $.each(data, function (index, program) {
+                  $("#programList").append(
+                    '<input type="checkbox" id="' +
+                      program.programid +
+                      '" value="' +
+                      program.programid +
+                      '" name="program"><label for="' +
+                      program.programid +
+                      '" class="checkbox-icon"></label><span class="checkbox-text"> ' +
+                      program.program +
+                      "</span>"
+                  );
+                });
+                $("#programContainer").show();
+              },
+              error: function () {
+                console.error("Error fetching programs");
+              },
+            });
+          } else {
+            $("#programContainer").hide();
+            $("#semesterContainer").hide();
+            $("#subjectContainer").hide();
+          }
+        });
+
+        $(document).on("change", 'input[name="program"]', function () {
+          var selectedPrograms = $('input[name="program"]:checked')
+            .map(function () {
+              return this.value;
+            })
+            .get();
+
+          if (selectedPrograms.length) {
+        	  var programId = selectedPrograms[0];
+        	  $.ajax({
+        		    type: "GET",
+        		    url: "/api/semester",  
+        		    data: { programId: programId }, 
+        		    success: function (data) {
+        		        $("#semesterList").empty(); 
+        		        $.each(data, function (index, semester) {
+        		            $("#semesterList").append(
+        		                '<input type="checkbox" id="' +
+        		                    semester.semesterid +
+        		                    '" value="' +
+        		                    semester.semesterid +
+        		                    '" name="semester"><label for="' +
+        		                    semester.semesterid +
+        		                    '" class="checkbox-icon"></label><span class="checkbox-text"> ' +
+        		                    semester.semester +
+        		                    "</span>"
+        		            );
+        		        });
+        		        $("#semesterContainer").show();  
+        		    },
+        		    error: function () {
+        		        console.error("Error fetching semesters");
+        		    }
+        		});
+
+          } else {
+            $("#semesterContainer").hide();
+            $("#subjectContainer").hide();
+          }
+        });
+
+        $(document).on("change", 'input[name="semester"]', function () {
+          var selectedSemesters = $('input[name="semester"]:checked')
+            .map(function () {
+              return this.value;
+            })
+            .get();
+
+          var departmentId = $("#department").val();
+          var selectedPrograms = $('input[name="program"]:checked')
+            .map(function () {
+              return this.value;
+            })
+            .get();
+
+          if (
+            selectedPrograms.length &&
+            selectedSemesters.length &&
+            departmentId
+          ) {
+            var programId = selectedPrograms[0];
+            var semesterId = selectedSemesters[0];
+
+            $.ajax({
+              type: "GET",
+              url: "/api/subjects",
+              data: { programId: programId, semesterId: semesterId },
+              success: function (data) {
+                $("#subjectList").empty();
+                $.each(data, function (index, subject) {
+                  $("#subjectList").append(
+                    '<input type="checkbox" id="' +
+                      subject.subjectid +
+                      '" value="' +
+                      subject.subjectid +
+                      '" name="subjects"><label for="' +
+                      subject.subjectid +
+                      '" class="checkbox-icon"></label><span class="checkbox-text"> ' +
+                      subject.subjectcode +
+                      " " +
+                      subject.subject +
+                      "</span><br>"
+                  );
+                });
+                $("#subjectContainer").show();
+              },
+              error: function () {
+                console.error("Error fetching subjects");
+              },
+            });
+          } else {
+            $("#subjectContainer").hide();
+          }
+        });
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        var editFacultyName = $("#editfacultyName");
+        var editDepartmentName = $("#editdepartmentName");
+
+        editFacultyName.on("change", function () {
+          loadDepartments(null, function () {
+            // Clear the programs, semesters, and subjects when faculty changes
+            $("#editprogramContainer").empty();
+            $("#editsemesterContainer").empty();
+            $("#editsubjectContainer").empty();
+          });
+        });
+
+        editDepartmentName.on("change", function () {
+          loadPrograms(null, function () {
+            // Clear the semesters and subjects when department changes
+            $("#editsemesterContainer").empty();
+            $("#editsubjectContainer").empty();
+          });
+        });
+      });
+
+      function loadDepartments(selectedDepartmentId, callback) {
+        var facultyId = $("#editfacultyName").val();
+        if (facultyId) {
+          $.ajax({
+            url: "/api/departments/" + facultyId,
+            type: "GET",
+            data: { facultyId: facultyId },
+            success: function (data) {
+              var departmentSelect = $("#editdepartmentName");
+              departmentSelect.empty();
+              departmentSelect.append(
+                '<option value="">Select Department</option>'
+              );
+              $.each(data, function (index, department) {
+                departmentSelect.append(
+                  '<option value="' +
+                    department.departmentid +
+                    '">' +
+                    department.department +
+                    "</option>"
+                );
+              });
+              if (selectedDepartmentId) {
+                departmentSelect.val(selectedDepartmentId);
+              }
+              if (callback) callback();
+            },
+            error: function () {
+              alert("Error loading departments");
+            },
+          });
+        } else {
+          $("#editdepartmentName")
+            .empty()
+            .append('<option value="">Select Department</option>');
+        }
+      }
+
+      function loadPrograms(selectedProgramIds, callback) {
+        var departmentId = $("#editdepartmentName").val();
+        if (departmentId) {
+          $.ajax({
+            url: "/api/programs/" + departmentId,
+            type: "GET",
+            success: function (data) {
+              var editprogramContainer = $("#editprogramContainer");
+              editprogramContainer.empty();
+
+              $.each(data, function (index, program) {
+                var checkboxId = "program_" + program.programid;
+                var checkbox = $('<input type="checkbox">')
+                  .attr("id", checkboxId)
+                  .attr("value", program.programid)
+                  .attr("name", "program");
+
+                if (
+                  selectedProgramIds &&
+                  selectedProgramIds.includes(String(program.programid))
+                ) {
+                  checkbox.prop("checked", true);
+                }
+
+                var label = $("<label>")
+                  .attr("for", checkboxId)
+                  .addClass("checkbox-icon");
+
+                var labelText = $("<span>")
+                  .addClass("checkbox-text")
+                  .text(program.program);
+
+                var checkboxDiv = $("<div>")
+                  .addClass("custom-checkbox")
+                  .css("margin-bottom", "15px")
+                  .append(checkbox)
+                  .append(label)
+                  .append(labelText);
+
+                checkbox.on("change", function () {
+                  $("#editsemesterContainer").empty();
+                  $("#editsubjectContainer").empty();
+                  if (checkbox.is(":checked")) {
+                    loadSemesters(null, program.programid);
+                  }
+                });
+
+                editprogramContainer.append(checkboxDiv);
+              });
+
+              if (callback) callback();
+            },
+            error: function () {
+              $("#editprogramError").text("Error loading programs");
+            },
+          });
+        } else {
+          $("#editprogramContainer").empty();
+        }
+      }
+
+      function loadSemesters(selectedSemesterIds, programId) {
+        if (programId) {
+          $.ajax({
+        	  type: "GET",
+              url: "/api/semester",
+            data: { programId: programId },
+            success: function (data) {
+              var semesterContainer = $("#editsemesterContainer");
+              semesterContainer.empty();
+
+              $.each(data, function (index, semester) {
+                var checkboxId = "semester_" + semester.semesterid;
+                var checkbox = $('<input type="checkbox">')
+                  .attr("id", checkboxId)
+                  .attr("value", semester.semesterid)
+                  .attr("name", "semester");
+
+                if (
+                  selectedSemesterIds &&
+                  selectedSemesterIds.includes(String(semester.semesterid))
+                ) {
+                  checkbox.prop("checked", true);
+                }
+
+                var label = $("<label>")
+                  .attr("for", checkboxId)
+                  .addClass("checkbox-icon");
+
+                var labelText = $("<span>")
+                  .addClass("checkbox-text")
+                  .text(semester.semester);
+
+                var checkboxDiv = $("<div>")
+                  .addClass("custom-checkbox")
+                  .css("margin-bottom", "15px")
+                  .append(checkbox)
+                  .append(label)
+                  .append(labelText);
+
+                checkbox.on("change", function () {
+                  $("#editsubjectContainer").empty();
+                  if (checkbox.is(":checked")) {
+                    loadSubjects(null, programId, semester.semesterid);
+                  }
+                });
+
+                semesterContainer.append(checkboxDiv);
+              });
+            },
+            error: function (xhr, status, error) {
+              console.error("Error loading semesters:", error);
+            },
+          });
+        } else {
+          $("#editsemesterContainer").empty();
+        }
+      }
+
+      function loadSubjects(selectedSubjectIds, programId, semesterId) {
+        if (programId && semesterId) {
+          $.ajax({
+            url: "/api/subjects",
+            type: "GET",
+            data: { programId: programId, semesterId: semesterId },
+            success: function (data) {
+              var subjectContainer = $("#editsubjectContainer");
+              subjectContainer.empty();
+
+              $.each(data, function (index, subject) {
+                var checkboxId = "subject_" + subject.subjectid;
+                var checkbox = $('<input type="checkbox">')
+                  .attr("id", checkboxId)
+                  .attr("value", subject.subjectid)
+                  .attr("name", "subjects");
+
+                if (
+                  selectedSubjectIds &&
+                  selectedSubjectIds.includes(String(subject.subjectid))
+                ) {
+                  checkbox.prop("checked", true);
+                }
+
+                var label = $("<label>")
+                  .attr("for", checkboxId)
+                  .addClass("checkbox-icon");
+
+                var labelText = $("<span>")
+                  .addClass("checkbox-text")
+                  .text(subject.subjectcode + " - " + subject.subject);
+
+                var checkboxDiv = $("<div>")
+                  .addClass("custom-checkbox")
+                  .css("margin-bottom", "-10px")
+                  .append(checkbox)
+                  .append(label)
+                  .append(labelText);
+
+                subjectContainer.append(checkboxDiv);
+                subjectContainer.append("<br>");
+              });
+            },
+            error: function (xhr, status, error) {
+              console.error("Error loading subjects:", error);
+              $("#editsubjectError").text("Error loading subjects");
+            },
+          });
+        } else {
+          $("#editsubjectContainer").empty();
+        }
+      }
+    </script>
+
+	<script>
+      function validateRegistrationId(type) {
+        const registrationId = document.getElementById(
+          type === "add" ? "registrationid" : "editregistrationid"
+        ).value;
+        const errorElement = document.getElementById(
+          type === "add" ? "registrationIdError" : "editregistrationIdError"
+        );
+        if (registrationId.length < 1 || registrationId.length > 255) {
+          errorElement.textContent = "Please enter a valid Teacher ID";
+          return false;
+        } else {
+          errorElement.textContent = "";
+          return true;
+        }
+      }
+
+      function validateName(type) {
+        const fname = document.getElementById(
+          type === "add" ? "fname" : "editfname"
+        ).value;
+        const mname = document.getElementById(
+          type === "add" ? "mname" : "editmname"
+        ).value;
+        const lname = document.getElementById(
+          type === "add" ? "lname" : "editlname"
+        ).value;
+        const errorElement = document.getElementById(
+          type === "add" ? "nameError" : "editnameError"
+        );
+
+        if (
+          fname.length < 2 ||
+          fname.length > 255 ||
+          mname.length < 2 ||
+          mname.length > 255 ||
+          lname.length < 2 ||
+          lname.length > 255
+        ) {
+          errorElement.textContent = "Please enter a valid name";
+          return false;
+        } else {
+          errorElement.textContent = "";
+          return true;
+        }
+      }
+
+      function validateEmail(type) {
+        const email = document.getElementById(
+          type === "add" ? "email" : "editemail"
+        ).value;
+        const errorElement = document.getElementById(
+          type === "add" ? "emailError" : "editemailError"
+        );
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if (!emailRegex.test(email)) {
+          errorElement.textContent = "Please enter a valid email address";
+          return false;
+        } else {
+          errorElement.textContent = "";
+          return true;
+        }
+      }
+
+      function validateContactNo(type) {
+        const contactNo = document.getElementById(
+          type === "add" ? "contactNo" : "editcontactNo"
+        ).value;
+        const errorElement = document.getElementById(
+          type === "add" ? "contactNoError" : "editcontactNoError"
+        );
+        const phoneRegex = /^[0-9]{10}$/;
+
+        if (!phoneRegex.test(contactNo)) {
+          errorElement.textContent = "Please enter a valid contact number";
+          return false;
+        } else {
+          errorElement.textContent = "";
+          return true;
+        }
+      }
+
+      function validateQualification(type) {
+        const qualification = document.getElementById(
+          type === "add" ? "qualification" : "editqualification"
+        ).value;
+        const errorElement = document.getElementById(
+          type === "add" ? "qualificationError" : "editqualificationError"
+        );
+
+        if (qualification.length < 2 || qualification.length > 255) {
+          errorElement.textContent = "Please enter a valid qualification";
+          return false;
+        } else {
+          errorElement.textContent = "";
+          return true;
+        }
+      }
+
+      function validateFacultyDropdown(type) {
+        const dropdown = document.getElementById(
+          type === "add" ? "faculty" : "editfacultyName"
+        );
+        const errorElement = document.getElementById(
+          type === "add" ? "facultyError" : "editfacultyError"
+        );
+
+        if (dropdown.value === "") {
+          errorElement.textContent = "Please select a faculty";
+          return false;
+        } else {
+          errorElement.textContent = "";
+          return true;
+        }
+      }
+
+      function validateDepartmentDropdown(type) {
+        const dropdown = document.getElementById(
+          type === "add" ? "department" : "editdepartmentName"
+        );
+        const errorElement = document.getElementById(
+          type === "add" ? "departmentError" : "editdepartmentError"
+        );
+
+        if (dropdown.value === "") {
+          errorElement.textContent = "Please select a department";
+          return false;
+        } else {
+          errorElement.textContent = "";
+          return true;
+        }
+      }
+      function validateProgramCheckboxSelection(type) {
+        const container = document.getElementById(
+          type === "add" ? "programContainer" : "editprogramContainer"
+        );
+        const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+        const errorElement = document.getElementById(
+          type === "add" ? "programError" : "editprogramError"
+        );
+
+        let isChecked = false;
+        checkboxes.forEach((checkbox) => {
+          if (checkbox.checked) {
+            isChecked = true;
+          }
+        });
+
+        if (!isChecked) {
+          errorElement.textContent = "Please select at least one program";
+          return false;
+        } else {
+          errorElement.textContent = "";
+          return true;
+        }
+      }
+
+      function validateSemesterCheckboxSelection(type) {
+        const container = document.getElementById(
+          type === "add" ? "semesterContainer" : "editsemesterContainer"
+        );
+        const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+        const errorElement = document.getElementById(
+          type === "add" ? "semesterError" : "editsemesterError"
+        );
+
+        let isChecked = false;
+        checkboxes.forEach((checkbox) => {
+          if (checkbox.checked) {
+            isChecked = true;
+          }
+        });
+
+        if (!isChecked) {
+          errorElement.textContent = "Please select at least one semester";
+          return false;
+        } else {
+          errorElement.textContent = "";
+          return true;
+        }
+      }
+
+      function validateSubjectCheckboxSelection(type) {
+        const container = document.getElementById(
+          type === "add" ? "subjectContainer" : "editsubjectContainer"
+        );
+        const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+        const errorElement = document.getElementById(
+          type === "add" ? "subjectError" : "editsubjectError"
+        );
+
+        let isChecked = false;
+        checkboxes.forEach((checkbox) => {
+          if (checkbox.checked) {
+            isChecked = true;
+          }
+        });
+
+        if (!isChecked) {
+          errorElement.textContent = "Please select at least one subject";
+          return false;
+        } else {
+          errorElement.textContent = "";
+          return true;
+        }
+      }
+
+      function validateForm(type) {
+        const isValidRegistrationId = validateRegistrationId(type);
+        const isValidName = validateName(type);
+        const isValidEmail = validateEmail(type);
+        const isValidContactNo = validateContactNo(type);
+        const isValidQualification = validateQualification(type);
+        const isValidFacultyDropdown = validateFacultyDropdown(type);
+        const isValidDepartmentDropdown = validateDepartmentDropdown(type);
+        const isValidProgramCheckbox = validateProgramCheckboxSelection(type);
+        const isValidSemesterCheckbox = validateSemesterCheckboxSelection(type);
+        const isValidSubjectCheckbox = validateSubjectCheckboxSelection(type);
+
+        return (
+          isValidRegistrationId &&
+          isValidName &&
+          isValidEmail &&
+          isValidContactNo &&
+          isValidQualification &&
+          isValidFacultyDropdown &&
+          isValidDepartmentDropdown &&
+          isValidProgramCheckbox &&
+          isValidSemesterCheckbox &&
+          isValidSubjectCheckbox
+        );
+      }
+
+      document
+        .getElementById("faculty")
+        .addEventListener("change", function () {
+          var selectedFacultyId = this.value;
+          document.getElementById("facultyid").value = selectedFacultyId;
+        });
+      document
+        .getElementById("department")
+        .addEventListener("change", function () {
+          var selectedDepartmentId = this.value;
+          document.getElementById("departmentid").value = selectedDepartmentId;
+        });
+      document
+        .getElementById("program")
+        .addEventListener("change", function () {
+          var selectedProgramId = this.value;
+          document.getElementById("programid").value = selectedProgramId;
+        });
+      document
+        .getElementById("semester")
+        .addEventListener("change", function () {
+          var selectedSemesterId = this.value;
+          document.getElementById("semesterid").value = selectedSemesterId;
+        });
+    </script>
+
+	<script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var registrationIdInput = document.getElementById("registrationid");
+        var registrationIdError = document.getElementById(
+          "registrationIdError"
+        );
+
+        registrationIdInput.addEventListener("input", function () {
+          var value = registrationIdInput.value;
+
+          if (!/^\d*$/.test(value)) {
+            registrationIdError.textContent =
+              "Teacher ID must contain only numbers.";
+            registrationIdInput.classList.add("input-error");
+          } else {
+            registrationIdError.textContent = "";
+            registrationIdInput.classList.remove("input-error");
+          }
+        });
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        var registrationIdInput = document.getElementById("registrationid");
+        var card = document.querySelector(".card");
+
+        registrationIdInput.addEventListener("input", function () {
+          var registrationId = registrationIdInput.value;
+          var registrationRows = document.querySelectorAll(
+            ".registrations-table tbody tr"
+          );
+          var found = false;
+
+          registrationRows.forEach(function (row) {
+            if (
+              row.querySelector("td:nth-child(1)").textContent.trim() ===
+              registrationId
+            ) {
+              found = true;
+              var nameParts = row
+                .querySelector("td:nth-child(2)")
+                .textContent.trim()
+                .split(" ");
+              var fname = nameParts[0] || "";
+              var mname = nameParts[1] || "";
+              var lname = nameParts[2] || "";
+              var personalemail = row
+                .querySelector("td:nth-child(3)")
+                .textContent.trim();
+              var contactNo = row
+                .querySelector("td:nth-child(4)")
+                .textContent.trim();
+              var qualification = row
+                .querySelector("td:nth-child(5)")
+                .textContent.trim();
+              var facultyId = row
+                .querySelector("td:nth-child(6)")
+                .getAttribute("data-facultyid");
+              var departmentId = row
+                .querySelector("td:nth-child(7)")
+                .getAttribute("data-departmentid");
+
+              document.getElementById("fname").value = fname;
+              document.getElementById("mname").value = mname;
+              document.getElementById("lname").value = lname;
+              document.getElementById("email").value = personalemail;
+              document.getElementById("contactNo").value = contactNo;
+              document.getElementById("qualification").value = qualification;
+              document.getElementById("faculty").value = facultyId;
+
+              loadDepartment(facultyId, departmentId);
+
+              card.style.display = "block";
+            }
+          });
+
+          if (!found) {
+            card.style.display = "none";
+          }
+        });
+
+        function loadDepartment(facultyId, selectedDepartmentId) {
+          if (facultyId) {
+            $.ajax({
+              url: "/api/departments/" + facultyId,
+              type: "GET",
+              success: function (data) {
+                var departmentSelect = document.getElementById("department");
+                departmentSelect.innerHTML =
+                  '<option value="">Select Department</option>';
+                data.forEach(function (department) {
+                  var option = document.createElement("option");
+                  option.value = department.departmentid;
+                  option.textContent = department.department;
+                  departmentSelect.appendChild(option);
+                });
+                if (selectedDepartmentId) {
+                  departmentSelect.value = selectedDepartmentId;
+                }
+              },
+              error: function () {
+                alert("Error loading departments");
+              },
+            });
+          } else {
+            var departmentSelect = document.getElementById("department");
+            departmentSelect.innerHTML =
+              '<option value="">Select Department</option>';
+          }
+        }
+      });
+    </script>
+
+	<script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var editteacherModal = document.getElementById("editteacherModal");
+
+        editteacherModal.addEventListener("show.bs.modal", function (event) {
+          var button = event.relatedTarget;
+          var editteacherid = button.getAttribute("data-teacherid");
+          var editeditteacherid = document.getElementById("editteacherid");
+          editeditteacherid.value = editteacherid;
+
+          var row = button.closest("tr");
+          var registrationId = row
+            .querySelector("td:nth-child(1)")
+            .textContent.trim();
+          var firstName = row
+            .querySelector("td:nth-child(2)")
+            .textContent.trim()
+            .split(" ")[0];
+          var middleName = row
+            .querySelector("td:nth-child(2)")
+            .textContent.trim()
+            .split(" ")[1];
+          var lastName = row
+            .querySelector("td:nth-child(2)")
+            .textContent.trim()
+            .split(" ")[2];
+          var email = row.querySelector("td:nth-child(3)").textContent.trim();
+          var contactNo = row
+            .querySelector("td:nth-child(4)")
+            .textContent.trim();
+          var qualification = row
+            .querySelector("td:nth-child(5)")
+            .textContent.trim();
+          var facultyId = row
+            .querySelector("td:nth-child(6)")
+            .getAttribute("data-facultyid");
+          var departmentId = row
+            .querySelector("td:nth-child(7)")
+            .getAttribute("data-departmentid");
+          var programId = row
+            .querySelector("td:nth-child(8)")
+            .getAttribute("data-programid");
+          var semesterId = row
+            .querySelector("td:nth-child(9)")
+            .getAttribute("data-semesterid");
+          var subjectIds = Array.from(
+            row.querySelectorAll("td:nth-child(10) li")
+          ).map((li) => li.getAttribute("data-subjectid"));
+
+          document.getElementById("editregistrationid").value = registrationId;
+          document.getElementById("editfname").value = firstName;
+          document.getElementById("editmname").value = middleName;
+          document.getElementById("editlname").value = lastName;
+          document.getElementById("editemail").value = email;
+          document.getElementById("editcontactNo").value = contactNo;
+          document.getElementById("editqualification").value = qualification;
+          document.getElementById("editfacultyName").value = facultyId;
+
+          editfacultyName.value = facultyId;
+
+          loadDepartments(departmentId, function () {
+            $("#editdepartmentName").val(departmentId);
+
+            loadPrograms([programId], function () {
+              loadSemesters([semesterId], function () {
+                loadSubjects(subjectIds, programId, semesterId, function () {
+               
+                });
+              });
+            });
+          });
+
+          var editActiveCheckbox = document.getElementById("editactive");
+          editActiveCheckbox.checked =
+            row.querySelector(".badge-success") !== null;
+        });
+
+        var deleteteacherModal = document.getElementById("deleteteacherModal");
+        deleteteacherModal.addEventListener("show.bs.modal", function (event) {
+          var button = event.relatedTarget;
+          var teacherid = button.getAttribute("data-teacherid");
+
+          var deleteteacherid = document.getElementById("deleteteacherid");
+          deleteteacherid.value = teacherid;
+        });
+      });
+      function deleteTeacher() {
+        document.getElementById("deleteteacherForm").submit();
+      }
+    </script>
+
+	<script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+	<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="assets/vendor/chart.js/chart.umd.js"></script>
+	<script src="assets/vendor/echarts/echarts.min.js"></script>
+	<script src="assets/vendor/quill/quill.js"></script>
+	<script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+	<script src="assets/vendor/tinymce/tinymce.min.js"></script>
+	<script src="assets/vendor/php-email-form/validate.js"></script>
+
+	<script src="assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html
+  class="loading"
+  lang="en"
+  data-textdirection="ltr"
+  xmlns:th="http://www.thymeleaf.org"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Attendance Management System</title>
+    <link href="assets/img/favicon.png" rel="icon" />
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+
+    <link href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+      rel="stylesheet"
+    />
+
+    <link
+      href="assets/vendor/bootstrap/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="assets/vendor/bootstrap-icons/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet" />
+    <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet" />
+    <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet" />
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet" />
+    <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet" />
+
+    <link href="assets/css/style.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <div th:replace="~{student/nav :: body}"></div>
+    <main id="main" class="main">
+      <div class="pagetitle">
+        <h1>Leave</h1>
+        <nav>
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+            <li class="breadcrumb-item active">Leave</li>
+          </ol>
+        </nav>
+      </div>
+
+      <section class="section leave">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="card-title">Leave Records</h5>
+                  <div class="filter">
+                    <a class="icon" style="font-size: 20px" href="#"
+                      ><i
+                        class="fa fa-upload"
+                        data-bs-toggle="modal"
+                        data-bs-target="#model"
+                      ></i
+                    ></a>
+                  </div>
+                </div>
+                <table class="table-custom" style="margin: 0">
+                  <thead>
+                    <tr>
+                      <th scope="col">Leave Type</th>
+                      <th scope="col">Leave Start Date</th>
+                      <th scope="col">Leave End Date</th>
+                      <th scope="col">Total Leave Day</th>
+                      <th scope="col">Reason of Leave</th>
+                      <th scope="col">Supporting Documents</th>
+                      <th scope="col">Approval Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr th:each="leave : ${leaves}">
+                      <td th:text="${leave.leaveType.leaveType}"></td>
+                      <td
+                        th:text="${#dates.format(leave.startDate, 'yyyy-MM-dd')}"
+                      ></td>
+                      <td
+                        th:text="${#dates.format(leave.endDate, 'yyyy-MM-dd')}"
+                      ></td>
+                      <td th:text="${leave.totalLeaveDays}"></td>
+                      <td th:text="${leave.reason}"></td>
+                      <td th:text="${leave.fileName}"></td>
+                      <td>
+                        <p
+                          th:classappend="${leave.leaveStatus.leaveStatus == 'Approved' ? 'text-success' :
+                           (leave.leaveStatus.leaveStatus == 'Rejected' ? 'text-danger' : 'text-muted')}"
+                          th:text="${leave.leaveStatus.leaveStatus}"
+                        ></p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <div class="modal fade" id="model" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Leave Request</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form
+              class="row mb-3"
+              id="leaveForm"
+              th:action="@{/createStudentLeave}"
+              method="post"
+              enctype="multipart/form-data"
+              onsubmit="return validateForm()"
+            >
+              <div class="col-md-6">
+                <label for="leaveStartDate"
+                  ><i class="fas fa-calendar-alt"></i> Leave Start Date</label
+                >
+                <input
+                  type="date"
+                  class="form-control"
+                  name="leaveStartDate"
+                  id="leaveStartDate"
+                />
+              </div>
+              <div class="col-md-6">
+                <label for="leaveEndDate"
+                  ><i class="far fa-calendar-alt"></i> Leave End Date</label
+                >
+                <input
+                  type="date"
+                  class="form-control"
+                  name="leaveEndDate"
+                  id="leaveEndDate"
+                />
+              </div>
+              <p id="leaveEndDateError" class="error-message"></p>
+              <p id="leaveStartDateError" class="error-message"></p>
+              <div class="col-12">
+                <label for="leaveType"
+                  ><i class="fas fa-list"></i> Leave Type</label
+                >
+                <select class="form-select" name="leaveType" id="leaveType">
+                  <option value="" disabled selected>Select Leave Type</option>
+                  <option
+                    th:each="leaveType : ${leaveTypes}"
+                    th:if="${leaveType.active}"
+                    th:value="${leaveType.leaveTypeid}"
+                    th:text="${leaveType.leaveType}"
+                  ></option>
+                </select>
+                <p id="leaveTypeError" class="error-message"></p>
+              </div>
+
+              <div class="col-12">
+                <label for="leaveReason"
+                  ><i class="fa fa-pencil"></i> Reason for Leave</label
+                >
+                <textarea
+                  class="form-control"
+                  name="leaveReason"
+                  id="leaveReason"
+                  placeholder="Reason for Leave"
+                  style="height: 100px"
+                ></textarea>
+                <p id="leaveReasonError" class="error-message"></p>
+              </div>
+
+              <div class="col-12">
+                <label for="supportingDocument"
+                  ><i class="fas fa-file-upload"></i> Upload Supporting
+                  Document</label
+                >
+                <input
+                  type="file"
+                  class="form-control"
+                  name="supportingDocument"
+                  id="supportingDocument"
+                />
+                <p id="supportingDocumentError" class="error-message"></p>
+              </div>
+
+              <input
+                type="hidden"
+                name="leaveBy"
+                id="leaveBy"
+                th:value="${userDetails[student].studentid}"
+              />
+
+              <div class="col-12">
+                <button type="submit" class="btn btn-custom">
+                  Send Leave Request
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function validateLeaveStartDate() {
+        const startDate = document.getElementById("leaveStartDate").value;
+        const endDate = document.getElementById("leaveEndDate").value;
+        const today = new Date().toISOString().split("T")[0];
+        const errorElement = document.getElementById("leaveStartDateError");
+
+        if (!startDate || startDate <= today) {
+          errorElement.textContent =
+            "Leave start date cannot be today or earlier.";
+          return false;
+        }
+
+        if (startDate && endDate) {
+          const startDateObj = new Date(startDate);
+          const endDateObj = new Date(endDate);
+
+          if (startDateObj > endDateObj) {
+            errorElement.textContent =
+              "Leave start date must be before the leave end date.";
+            return false;
+          }
+        }
+
+        errorElement.textContent = "";
+        return true;
+      }
+
+      function validateLeaveEndDate() {
+        const startDate = document.getElementById("leaveStartDate").value;
+        const endDate = document.getElementById("leaveEndDate").value;
+        const today = new Date().toISOString().split("T")[0];
+        const errorElement = document.getElementById("leaveEndDateError");
+
+        if (!endDate || endDate <= today) {
+          errorElement.textContent =
+            "Leave end date cannot be today or earlier.";
+          return false;
+        }
+
+        if (startDate && endDate) {
+          const startDateObj = new Date(startDate);
+          const endDateObj = new Date(endDate);
+
+          if (endDateObj < startDateObj) {
+            errorElement.textContent =
+              "Leave end date must be after the leave start date.";
+            return false;
+          }
+        }
+
+        errorElement.textContent = "";
+        return true;
+      }
+
+      function validateLeaveType() {
+        const leaveType = document.getElementById("leaveType").value;
+        const errorElement = document.getElementById("leaveTypeError");
+
+        if (!leaveType) {
+          errorElement.textContent = "Please select valid Leave Type";
+          return false;
+        } else {
+          errorElement.textContent = "";
+          return true;
+        }
+      }
+
+      function validateLeaveReason() {
+        const leaveReason = document.getElementById("leaveReason").value;
+        const errorElement = document.getElementById("leaveReasonError");
+
+        if (leaveReason.length < 5 || leaveReason.length > 255) {
+          errorElement.textContent = "Please enter meaningful leave reason";
+          return false;
+        } else {
+          errorElement.textContent = "";
+          return true;
+        }
+      }
+
+      function validateSupportingDocument() {
+        const supportingDocument =
+          document.getElementById("supportingDocument").files.length;
+        const errorElement = document.getElementById("supportingDocumentError");
+
+        if (supportingDocument === 0) {
+          errorElement.textContent = "Please select valid supporting document";
+          return false;
+        } else {
+          errorElement.textContent = "";
+          return true;
+        }
+      }
+
+      function validateForm() {
+        const isStartDateValid = validateLeaveStartDate();
+        const isEndDateValid = validateLeaveEndDate();
+        const isLeaveTypeValid = validateLeaveType();
+        const isLeaveReasonValid = validateLeaveReason();
+        const isSupportingDocumentValid = validateSupportingDocument();
+
+        handleDateChange();
+
+        return (
+          isStartDateValid &&
+          isEndDateValid &&
+          isLeaveTypeValid &&
+          isLeaveReasonValid &&
+          isSupportingDocumentValid
+        );
+      }
+
+      document
+        .getElementById("leaveStartDate")
+        .addEventListener("blur", validateLeaveStartDate);
+      document
+        .getElementById("leaveEndDate")
+        .addEventListener("blur", validateLeaveEndDate);
+      document
+        .getElementById("leaveType")
+        .addEventListener("blur", validateLeaveType);
+      document
+        .getElementById("leaveReason")
+        .addEventListener("blur", validateLeaveReason);
+      document
+        .getElementById("supportingDocument")
+        .addEventListener("blur", validateSupportingDocument);
+      document
+        .getElementById("leaveStartDate")
+        .addEventListener("change", handleDateChange);
+      document
+        .getElementById("leaveEndDate")
+        .addEventListener("change", handleDateChange);
+    </script>
+    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="assets/vendor/echarts/echarts.min.js"></script>
+    <script src="assets/vendor/quill/quill.js"></script>
+    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>

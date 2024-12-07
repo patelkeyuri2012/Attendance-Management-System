@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html
+  class="loading"
+  lang="en"
+  data-textdirection="ltr"
+  xmlns:th="http://www.thymeleaf.org"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Attendance Management System</title>
+    <link href="assets/img/favicon.png" rel="icon" />
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+
+    <link href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+      rel="stylesheet"
+    />
+
+    <link
+      href="assets/vendor/bootstrap/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="assets/vendor/bootstrap-icons/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet" />
+    <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet" />
+    <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet" />
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet" />
+    <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet" />
+
+    <link href="assets/css/style.css" rel="stylesheet" />
+
+    <script>
+      function preventBack() {
+        window.history.forward();
+      }
+
+      setTimeout("preventBack()", 0);
+
+      window.onunload = function () {
+        null;
+      };
+    </script>
+  </head>
+
+  <body>
+    <header id="header" class="header fixed-top d-flex align-items-center">
+      <div class="d-flex align-items-center justify-content-between">
+        <a href="index.html" class="logo d-flex align-items-center">
+          <img src="assets/img/logo.png" alt="GVP" /><span
+            class="d-none d-lg-block"
+            >Gujarat Vidyapith</span
+          >
+        </a>
+        <i class="fa fa-bars toggle-sidebar-btn"></i>
+      </div>
+
+      <nav class="header-nav ms-auto">
+        <ul class="d-flex align-items-center">
+          <li class="nav-item dropdown">
+            <a class="nav-link nav-icon" href="../signout">
+              <i class="fa fa-power-off"></i>
+            </a>
+          </li>
+
+          <li class="nav-item dropdown pe-3">
+            <a
+              class="nav-link nav-profile d-flex align-items-center pe-0"
+              href="#"
+              data-bs-toggle="modal"
+              data-bs-target="#profileModel"
+            >
+              <img
+                th:src="@{${userDetails.image}}"
+                alt="Profile"
+                class="rounded-circle"
+              />
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <aside id="sidebar" class="sidebar">
+      <ul class="sidebar-nav" id="sidebar-nav">
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="index.html">
+            <i class="fa fa-th-list"></i> <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a
+            class="nav-link collapsed"
+            data-bs-target="#campus-nav"
+            data-bs-toggle="collapse"
+            href="#"
+          >
+            <i class="fa fa-university"></i><span>Campus</span
+            ><i class="fa fa-chevron-down ms-auto"></i>
+          </a>
+          <ul
+            id="campus-nav"
+            class="nav-content collapse"
+            data-bs-parent="#campus-nav"
+          >
+            <li>
+              <a class="nav-link collapsed" href="faculty.html"
+                ><i class="fa fa-circle"></i><span>Faculty</span></a
+              >
+            </li>
+
+            <li>
+              <a class="nav-link collapsed" href="department.html"
+                ><i class="fa fa-circle"></i><span>Department</span></a
+              >
+            </li>
+
+            <li>
+              <a class="nav-link collapsed" href="program.html"
+                ><i class="fa fa-circle"></i><span>Program</span></a
+              >
+            </li>
+
+            <li>
+              <a class="nav-link collapsed" href="subject.html"
+                ><i class="fa fa-circle"></i><span>Subject</span></a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a
+            class="nav-link collapsed"
+            data-bs-target="#student-nav"
+            data-bs-toggle="collapse"
+            href="#"
+          >
+            <i class="fa fa-users"></i><span>Users Management</span
+            ><i class="fa fa-chevron-down ms-auto"></i>
+          </a>
+          <ul
+            id="student-nav"
+            class="nav-content collapse"
+            data-bs-parent="#sidebar-nav"
+          >
+            <li>
+              <a class="nav-link collapsed" href="teacher.html"
+                ><i class="fa fa-circle"></i><span>Teacher</span></a
+              >
+            </li>
+
+            <li>
+              <a class="nav-link collapsed" href="student.html"
+                ><i class="fa fa-circle"></i><span>Student</span></a
+              >
+            </li>
+
+            <li>
+              <a class="nav-link collapsed" href="role.html"
+                ><i class="fa fa-circle"></i><span>Role and Permission</span></a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="result.html">
+            <i class="fas fa-chart-line"></i> <span>Result</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="leave.html">
+            <i class="fa fa-id-badge"></i> <span>Leave</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="academicCalendar.html">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Academic Calendar</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <a
+      href="#"
+      class="back-to-top d-flex align-items-center justify-content-center"
+      ><i class="bi bi-arrow-up-short"></i
+    ></a>
+
+    <div class="modal fade" id="profileModel" tabindex="-1">
+      <div class="modal-dialog modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Profile Details</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="card-body pt-3">
+              <div class="row">
+                <div class="col-5">
+                  <div class="profile-card mb-4">
+                    <img
+                      th:src="@{${userDetails.image}}"
+                      alt="Profile"
+                      class="profile-img"
+                    />
+
+                    <h2
+                      th:text="${userDetails.fname + ' ' + userDetails.lname }"
+                    ></h2>
+                  </div>
+                </div>
+                <div class="col-7">
+                  <div th:if="${userDetails != null}">
+                    <div class="card-body">
+                      <h5 class="card-title">Personal Details</h5>
+                      <hr class="divider mt-0 mb-4" />
+                      <div class="row">
+                        <div class="detail-row">
+                          <div class="label">Name</div>
+                          <div
+                            class="text-muted"
+                            th:text="${userDetails.fname + ' ' + userDetails.mname + ' ' + userDetails.lname}"
+                          ></div>
+                        </div>
+                        <div class="detail-row">
+                          <div class="label">Email</div>
+                          <div
+                            class="text-muted"
+                            th:text="${userDetails.email}"
+                          ></div>
+                        </div>
+                        <div class="detail-row">
+                          <div class="label">Contact No</div>
+                          <div
+                            class="text-muted"
+                            th:text="${userDetails.contactno}"
+                          ></div>
+                        </div>
+                        <div class="detail-row">
+                          <div class="label">Qualification</div>
+                          <div
+                            class="text-muted"
+                            th:text="${userDetails.qualification}"
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document
+        .querySelector(".toggle-sidebar-btn")
+        .addEventListener("click", function () {
+          document.body.classList.toggle("toggle-sidebar");
+        });
+
+      function setActiveNav() {
+        const currentUrl = window.location.href;
+        const navItems = document.querySelectorAll(".sidebar-nav .nav-link");
+
+        navItems.forEach((item) => {
+          if (currentUrl.includes(item.getAttribute("href"))) {
+            item.classList.remove("collapsed");
+            item.classList.add("active");
+            const parent = item.closest(".nav-item");
+            if (parent && parent.classList.contains("nav-item")) {
+              parent.classList.add("active");
+              if (parent.querySelector('[data-bs-target="#student-nav"]')) {
+                const studentNav = document.querySelector("#student-nav");
+                if (studentNav) {
+                  studentNav.classList.add("show");
+                }
+              }
+              if (parent.querySelector('[data-bs-target="#campus-nav"]')) {
+                const classNav = document.querySelector("#campus-nav");
+                if (classNav) {
+                  classNav.classList.add("show");
+                }
+              }
+            }
+          }
+        });
+      }
+
+      window.onload = setActiveNav;
+    </script>
+
+    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="assets/vendor/echarts/echarts.min.js"></script>
+    <script src="assets/vendor/quill/quill.js"></script>
+    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>

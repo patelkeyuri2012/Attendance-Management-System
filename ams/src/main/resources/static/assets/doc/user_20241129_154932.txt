@@ -1,0 +1,479 @@
+ASSIGNMENT 2
++++++++++++++++++++++++
+-----Free Space Distribution by Segment Type------
+SELECT 
+    s.SEGMENT_TYPE,
+    SUM(f.BLOCKS) AS FREE_BLOCKS
+FROM 
+    DBA_FREE_SPACE f
+JOIN 
+    DBA_SEGMENTS s ON f.TABLESPACE_NAME = s.TABLESPACE_NAME
+GROUP BY 
+    s.SEGMENT_TYPE;
+	
+------Largest Free Blocks per Tablespace--------
+SELECT 
+    f.TABLESPACE_NAME,
+    MAX(f.BLOCKS) AS LARGEST_FREE_BLOCKS
+FROM 
+    DBA_FREE_SPACE f
+GROUP BY 
+    f.TABLESPACE_NAME;
+----------Segments with Insufficient Free Space-----------
+SELECT  
+    TABLESPACE_NAME,
+    BLOCK_ID,
+    BLOCKS,
+    'FREE' AS SPACE_TYPE
+FROM 
+    DBA_FREE_SPACE
+WHERE 
+    TABLESPACE_NAME = 'STUD'
+UNION ALL
+SELECT 
+    TABLESPACE_NAME,
+    BLOCK_ID,
+    BLOCKS,
+    'OCCUPIED' AS SPACE_TYPE
+FROM 
+    DBA_EXTENTS 
+WHERE 
+    TABLESPACE_NAME = 'STUD';
+
+
+
+++++++++++++++++++++++
+ASSIGNMENT 3:
+select * from emp;
+
+        ID NM
+---------- --------------------
+         1 rahi
+
+SQL> select * from emp where id=1 for update;
+
+        ID NM
+---------- --------------------
+         1 rahi
+
+SQL> column username format a20
+SQL> column type format a10
+SQL> column lmode format a20
+SQL> column sid format 9999
+SQL> column serial format a20
+SQL>
+SQL> SELECT s.sid,
+  2         s.serial#,
+  3         s.username,
+  4         l.type,
+  5         l.lmode,
+  6         l.request,
+  7         l.id1,
+  8         l.id2
+  9    FROM v$session s, v$lock l
+ 10   WHERE s.sid = l.sid
+ 11     AND s.sid = 11 ;
+
+  SID    SERIAL# USERNAME             TYPE            LMODE    REQUEST        ID1        ID2
+----- ---------- -------------------- ---------- ---------- ---------- ---------- ----------
+   11      15226 MCA315               AE         ##########          0        134          1
+   11      15226 MCA315               TM         ##########          0     212900          0
+   11      15226 MCA315               TX         ##########          0     524289      18412
+
+SQL>
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ASSIGNMENT 4:
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ASSIGNMENT 5:
+SQL> select
+  2  ( 1 - (phy.value / ( cur.value + con.value ) ) ) * 100 as "hit ratio"
+  3  from
+  4   v$sysstat cur,
+  5   v$sysstat con,
+  6   v$sysstat phy
+  7  where
+  8    cur.name='db block gets'
+  9    and con.name='consistent gets'
+ 10    and phy.name='physical reads';
+
+ hit ratio
+----------
+98.2096964
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ASSIGNMENT 6:
+*********shared pool hit ratio************
+SELECT
+    ROUND((1 - (SUM(reloads) / SUM(pins))) * 100, 2) AS "Shared Pool Hit Ratio (%)"
+FROM
+    v$librarycache
+WHERE
+    namespace = 'SQL AREA'
+    AND pins > 0;
+***************redu log hit ratio***********
+SELECT
+    ROUND((a.value / (a.value + b.value)) * 100, 2) AS "Redo Log Buffer Hit Ratio (%)"
+FROM
+    v$sysstat a,
+    v$sysstat b
+WHERE
+    a.name = 'redo entries'
+    AND b.name = 'redo writes';
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ASSIGNMENT 7:
+ SQL> explain plan for select * from emp where id=1;
+
+Explained.
+
+SQL> select * from table(dbms_xplan.display);
+     OR
+
+EXPLAIN PLAN SET STATEMENT_ID = 'mca15' FOR
+SELECT * FROM emp WHERE id = 1;
+
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY('PLAN_TABLE', 'mca', 'BASIC'));
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ASSIGNMENT 8:
+select p.value/(p.value+d.value) "sort area contenation" from v$sysstat p, v$sysstat d where p.name='sorts (memory)' and d.name='sorts (disk)';
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ASSIGNMENT 9:
+create or replace type phone as varray(5) of varchar(10);
+
+create table student (id number, mno phone);  
+
+create or replace procedure manage_mno(
+    sid in number,
+    acn in varchar,
+    mno in varchar,
+    upmno in varchar default null
+    
+)
+is
+    newphone phone;
+	newnumber phone := phone();
+begin
+  select mno into newphone from students where id=sid;
+  if acn = 'insert' then
+        newphone.extend;
+        newphone(newphone.last):=mno;
+        update students set mno = newphone where id = sid;
+ elsif acn='update' then
+       for i in 1..newphone.count loop
+			if newphone(i) = mno then
+				newphone(i) := upmno;
+                update students set mno = newphone where id = sid;
+			end if;
+		end loop;
+	elsif acn='delete' then
+		for i in 1..newphone.count loop
+			if newphone(i) != mno then
+				newnumber.extend;
+				newnumber(newnumber.count) := newphone(i);
+			 end if;
+		end loop;
+       update students set mno = newnumber where id = sid;
+end if;
+end;
+/
++++++++++++++++++
+begin
+   manage_mno(1,'insert',9876543678);
+end;
+/
+++++++++++++++++
+begin
+   manage_mno(1,'update',9876543678,1234567890);
+end;
+/
+++++++++++++++
+begin
+   manage_mno(1,'delete',987654321);
+end;
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ASSIGNMENT 10:
+CREATE OR REPLACE TYPE submark AS OBJECT (
+    subject_name VARCHAR2(20),
+    mark NUMBER
+);
+
+CREATE OR REPLACE TYPE submarktable AS TABLE OF submark;
+/
+
+CREATE TABLE result (
+    sid NUMBER,              
+    subjects submarktable   
+)
+NESTED TABLE subjects STORE AS sub_table;
+
+
+				  -----insert---------
+CREATE OR REPLACE PROCEDURE insert_subject (
+    p_sid NUMBER,              
+    p_subject_name VARCHAR2,  
+    p_mark NUMBER              
+) IS
+BEGIN
+    
+        INSERT INTO TABLE(SELECT subjects FROM result WHERE sid = p_sid)
+        VALUES(submark(p_subject_name, p_mark));
+    
+    
+    COMMIT;
+END;
+/
+         --------------update--------------
+   CREATE OR REPLACE PROCEDURE update_subject_mark (
+    p_sid NUMBER,              
+    p_subject_name VARCHAR2,   
+    p_new_mark NUMBER          
+) IS
+BEGIN
+    
+    UPDATE TABLE(SELECT subjects FROM result WHERE sid = p_sid)
+    SET mark = p_new_mark
+    WHERE subject_name = p_subject_name;
+    
+    COMMIT;
+END;
+/
+--------------------delete-------------------
+create or replace procedure delete_submark(studid in number,subname in varchar)
+is
+begin
+  delete from table(select subjects from result where sid=studid)where subject_name=subname;
+end;
+/
+exec delete_submark(1,'english');
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+create or replace procedure update_subject(pid in number,psub in varchar,pmarks number)
+is
+begin
+   update table(select subjects from result where sid=pid)set mark=pmarks where subject_name=psub;
+end;
+/
+++++++++++++++++++++++++++++++++++++++++assignment 14+++++++++++++++++++++++++++++++++++++++++++++
+create table dept(id number primary key,dept_nm varchar(20));
+
+create index idx on dept(dept_nm);
+
+insert into dept values(1,'computer-science');
+
+insert into dept values(2,'hindi');
+
+create cluster bookclt(std_id number)
+storage(initial 200
+        next 300k
+        minextents 2
+        maxextents 200);
+
+create table students(
+std_id number,
+name varchar(20)
+)cluster bookclt(std_id);
+
+create table books(
+book_id  number primary key,
+std_id number,
+book_name varchar(20)
+)cluster bookclt(std_id);
+
+create index cltidx on cluster bookclt;
+
+   
+insert into students values(1,'drashti');
+insert into students values(2,'sandhya');
+
+insert into books values(1,1,'maths');
+insert into books values(2,2,'english');
+
+
+BEGIN
+     DBMS_DDL.ANALYZE_OBJECT('TABLE','MCA315','EMP','ESTIMATE');
+     DBMS_DDL.ANALYZE_OBJECT('INDEX','MCA315','IDX','ESTIMATE');
+     DBMS_DDL.ANALYZE_OBJECT('CLUSTER','MCA315','BOOKCLT','ESTIMATE');
+END;
+
+************using command***************
+ANALYZE TABLE EMP COMPUTE STATISTICS;
+
+ANALYZE INDEX IDX COMPUTE STATISTICS;
+
+
+ANALYZE CLUSTER bookclt COMPUTE STATISTICS;
+
+SELECT 
+    cluster_name,
+   TABLESPACE_NAME ,
+   PCT_FREE ,
+    PCT_USED
+    FROM 
+    user_clusters
+WHERE cluster_name='bookclt' and owner='mca315';
+++++++++++++++++++++++++++++++++++assgnmet13++++++++++++++++++++++++++++++++++++++
+
+******************creating invalid procedure***********************
+CREATE OR REPLACE PROCEDURE invalid_procedure AS
+BEGIN
+   SELECT * FROM demo;
+END;
+/
+***************************creating invalid package****************************
+
+CREATE OR REPLACE PACKAGE invalid_package IS
+  PROCEDURE test_procedure;
+END invalid_package;
+/
+
+CREATE OR REPLACE PACKAGE BODY invalid_package IS
+  PROCEDURE test_procedure AS
+  BEGIN
+       SELECT * FROM demo;
+  END test_procedure;
+END invalid_package;
+/
+
+************************recompile*****************************
+BEGIN
+  FOR rec IN (SELECT object_name, object_type 
+              FROM user_objects 
+              WHERE object_type IN ('PACKAGE', 'PROCEDURE') 
+              AND status = 'INVALID') 
+  LOOP
+    DBMS_DDL.alter_compile(rec.object_type, USER, rec.object_name);
+  END LOOP;
+END;
+/
+*****************************show status*********************
+SELECT object_name, object_type, status 
+FROM user_objects 
+WHERE object_type IN ('PACKAGE', 'PROCEDURE');-------must written in capital
+
+
+
+
+
+
+ begin
+    for rec in(select object_name,object_type from user_objects where object_type in('package','procedure') and status='invalid')
+  loop
+     DBMS_DDL.ALTER_COMPILE(REC.OBJECT_TYPE,USER,REC.OBJECT_NAME);
+   END LOOP;
+  END;
+/
+
+*****************************************assignment14*****************************************
+
+BEGIN
+        DBMS_DDL.ANALYZE_OBJECT('TABLE','MCA315', 'student',  'COMPUTE');
+        DBMS_DDL.ANALYZE_OBJECT('CLUSTER','MCA315', 'std_cluster', 'COMPUTE');
+        DBMS_DDL.ANALYZE_OBJECT('INDEX','MCA315', 'std_cluster_index', 'COMPUTE');
+ END;
+/
+
+----->view table
+SQL> SELECT table_name, num_rows, blocks, avg_row_len from user_tab_statistics where table_name='STUDENT';****table name must written in capital
+
+TABLE_NAME                                                                                                                NUM_ROWS      BLOCKS AVG_ROW_LEN
+-------------------------------------------------------------------------------------------------------------------------------- ---------- ---------- -----------
+STUDENT
+ 1           5          80
+
+---->view cluster
+
+SQL> select cluster_name from dba_clusters where owner='MCA315';
+
+CLUSTER_NAME
+--------------------------------------------------------------------------------------------------------------------------------
+BOOKCLT
+STD_CLUSTER
+
+-------->VIEW INDEX
+SQL> SELECT index_name, num_rows, leaf_blocks, distinct_keys FROM user_indexes where index_name='STD_CLUSTER_INDEX';**** name must written in capital
+
+
+INDEX_NAME                                                                                                                NUM_ROWS LEAF_BLOCKS DISTINCT_KEYS
+-------------------------------------------------------------------------------------------------------------------------------- ---------- ----------- -------------
+STD_CLUSTER_INDEX
+ 1            1             1
+
+*******************************************************assignment17***********************************************************
+
+
+create or replace procedure manage_employee(p_operation in varchar2,p_empid in number,p_empnm in varchar2) is
+  v_sql varchar2(100);
+  v_tablenm varchar2(50):='employees';
+begin
+    if p_operation = 'INSERT' then
+        v_sql:='insert into '|| v_tablenm || '(EMPLOYEE_ID, EMPLOYEE_NAME) values (:bindid,:bindnm)';  -- Add proper spacing in the INSERT queryEXAMPLE   
+        EXECUTE IMMEDIATE v_sql USING p_empid,p_empnm;                                                  ---insert into ' AFTER INTO GIVE SPACE
+        DBMS_OUTPUT.PUT_LINE('RECORD INSERT SUCESSFULLY');
+
+   elsif p_operation='update' then
+      v_sql:='update '||v_tablenm|| ' set EMPLOYEE_NAME=:bindnm where EMPLOYEE_ID=:bindid';
+      EXECUTE IMMEDIATE v_sql using p_empnm,p_empid;
+      DBMS_OUTPUT.PUT_LINE('RECORD UPDATE SUCESSFULLY');
+
+   elsif p_operation='delete' then
+     v_sql:='delete from '|| v_tablenm || ' where EMPLOYEE_ID=:bindid';
+     EXECUTE IMMEDIATE v_sql using p_empid;
+     DBMS_OUTPUT.PUT_LINE('RECORD DELETE SUCESSFULLY');
+   else
+      DBMS_OUTPUT.PUT_LINE('Invalid operation. Please choose INSERT, UPDATE, or DELETE.');
+   end if;
+
+end;
+/
+
+begin
+    manage_employee('delete',1,'MAHI');
+end;
+___________________________________show data________________________________________
+
+create or replace procedure fetch_data(
+    pid in number,
+    eid out number,
+    pnm out varchar2
+)
+is
+ v_sql varchar2(200);
+ 
+begin
+   v_sql:= 'select EMPLOYEE_ID, EMPLOYEE_NAME from EMPLOYEES where EMPLOYEE_ID =:bindid';
+   EXECUTE IMMEDIATE v_sql into eid,pnm USING pid;
+end;
+/
+
+DECLARE
+    emp_name VARCHAR2(100);
+    empid number;
+BEGIN
+    fetch_data(1000,empid,emp_name);
+     DBMS_OUTPUT.PUT_LINE('Employee ID: ' || empid); 
+    DBMS_OUTPUT.PUT_LINE('Employee Name: ' || emp_name); 
+END;
+/
+**************************************** assignment12********************************************
+DECLARE
+    v_free_blks NUMBER; 
+BEGIN
+    -- Check the fragmentation in the segment 
+    DBMS_SPACE.FREE_BLOCKS(
+        segment_owner     => 'MCA315',  
+        segment_name      => 'EMPLOYEES', 
+        segment_type      => 'TABLE',   
+        freelist_group_id => 1,         
+        free_blks         => v_free_blks, 
+        scan_limit        => NULL,      
+        partition_name    => NULL      
+    );
+
+    -- Display the result (number of free blocks)
+    DBMS_OUTPUT.PUT_LINE('Free Blocks: ' || v_free_blks);
+END;
+/

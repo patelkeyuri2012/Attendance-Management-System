@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html class="loading" lang="en" data-textdirection="ltr"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<title>Attendance Management System</title>
+<link href="assets/img/favicon.png" rel="icon" />
+<link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
+
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+	integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+	crossorigin="anonymous" />
+
+<link href="https://fonts.gstatic.com" rel="preconnect" />
+<link
+	href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+	rel="stylesheet" />
+
+<link href="assets/vendor/bootstrap/css/bootstrap.min.css"
+	rel="stylesheet" />
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.css"
+	rel="stylesheet" />
+<link href="assets/vendor/boxicons/css/boxicons.min.css"
+	rel="stylesheet" />
+<link href="assets/vendor/quill/quill.snow.css" rel="stylesheet" />
+<link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet" />
+<link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet" />
+<link href="assets/vendor/simple-datatables/style.css" rel="stylesheet" />
+<link href="assets/css/style.css" rel="stylesheet" />
+</head>
+
+<body>
+	<div th:replace="~{HOD/nav :: body}"></div>
+	<main id="main" class="main">
+		<div class="pagetitle">
+			<h1>Schedule</h1>
+			<nav>
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="index.html">Home</a></li>
+					<li class="breadcrumb-item active">Schedule</li>
+				</ol>
+			</nav>
+		</div>
+
+		<section class="section timetable">
+			<div class="col-12 d-flex">
+				<div th:each="entry : ${programSemesterStudentMap}" class="d-flex">
+					<div th:each="semesterDetail : ${entry.value}" class="card"
+						style="margin-right: 10px; width: 125px">
+						<div class="card-body"
+							style="margin-top: 10px; text-align: center">
+							<a href="#"
+								th:data-semester-id="${semesterDetail.semester.semesterid}"
+								th:data-program="${entry.key.program}"
+								th:data-program-id="${entry.key.programid}"
+								th:data-semester="${semesterDetail.semester.semester}"
+								onclick="handleShowContent(this, event)"> <span
+								class="card-title" th:text="${entry.key.program}"></span> <span
+								class="card-title" th:text="${semesterDetail.semester.semester}"></span>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<input type="hidden" id="teacherId"
+				th:value="${userDetails.teacherid}" />
+
+			<div class="card" id="timetable" style="display: block">
+				<div class="card-body" style="padding-top: 25px;">
+					<table class="table-custom"
+						style="margin: 0; text-align: center; max-width: 100wh">
+						<thead>
+							<tr class="bg-light-gray">
+								<th class="text-uppercase"
+									style="border-right: 2px solid #dddddd">Time</th>
+								<th class="text-uppercase" id="mon">Monday</th>
+								<th class="text-uppercase" id="tue">Tuesday</th>
+								<th class="text-uppercase" id="wed">Wednesday</th>
+								<th class="text-uppercase" id="thu">Thursday</th>
+								<th class="text-uppercase" id="fri">Friday</th>
+								<th class="text-uppercase" id="sat">Saturday</th>
+							</tr>
+						</thead>
+						<tbody id="timetable-body"></tbody>
+					</table>
+				</div>
+			</div>
+
+			<div class="card" id="timetableContent" style="display: none">
+				<div class="card-body">
+					<div class="d-flex justify-content-between align-items-center">
+						<h5 class="card-title"></h5>
+						<button type="button" class="btn-close" aria-label="Close"
+							onclick="closeTimetableContent()">
+							<i class="fa fa-times"></i>
+						</button>
+					</div>
+
+					<table class="table-custom"
+						style="margin: 0; text-align: center; max-width: 100wh">
+						<thead>
+							<tr class="bg-light-gray">
+								<th class="text-uppercase"
+									style="border-right: 2px solid #dddddd">Time</th>
+								<th class="text-uppercase" id="mon">Monday</th>
+								<th class="text-uppercase" id="tue">Tuesday</th>
+								<th class="text-uppercase" id="wed">Wednesday</th>
+								<th class="text-uppercase" id="thu">Thursday</th>
+								<th class="text-uppercase" id="fri">Friday</th>
+								<th class="text-uppercase" id="sat">Saturday</th>
+							</tr>
+						</thead>
+						<tbody id="assign-timetable-body"></tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<div class="modal fade" id="addTimetableModal" tabindex="-1"
+		aria-labelledby="addTimetableModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="addTimetableModalLabel">Add
+						Timetable</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<i class="fa fa-times"></i>
+					</button>
+				</div>
+
+				<div class="modal-body">
+					<form class="row mb-3" id="addTimetableForm"
+						th:action="@{/addTimetables}" method="post"
+						onsubmit="return validateForm('add')">
+						<input type="hidden" id="program" name="program" /> <input
+							type="hidden" id="semester" name="semester" /> <input
+							type="hidden" id="day" name="day" />
+						<div class="col-md-12">
+							<label for="subject" class="col-md-12 mb-3"><i
+								class="fas fa-book-open"></i>Subject</label> <select
+								id="subjectDropdown" class="form-control" name="subject">
+								<option value="">Select Subject</option>
+
+							</select> <input type="hidden" id="subjectid" name="subjectid" />
+							<p id="subjectError" class="error-message"></p>
+						</div>
+						<div class="col-md-6">
+							<label for="startTime"><i class="fas fa-hourglass-start"></i>
+								Start Time</label> <input type="time" class="form-control"
+								id="startTime" name="startTime" />
+							<p id="startTimeError" class="error-message"></p>
+						</div>
+						<div class="col-md-6">
+							<label for="endTime"><i class="fas fa-hourglass-end"></i>
+								End Time</label> <input type="time" class="form-control" id="endTime"
+								name="endTime" />
+							<p id="endTimeError" class="error-message"></p>
+						</div>
+						<div class="col-md-12">
+							<label for="teacher" class="col-md-12 mb-3"><i
+								class="fas fa-chalkboard-teacher"></i>Teacher</label> <select
+								id="teacher" class="form-control" name="teacher">
+								<option value="">Select Teacher</option>
+								<option th:each="teacher : ${teachers}"
+									th:if="${teacher.active}" th:value="${teacher.teacherid}"
+									th:text="${teacher.fname + ' ' + (teacher.mname != null ? teacher.mname + ' ' : '') + teacher.lname}"></option>
+							</select> <input type="hidden" id="teacherid" name="teacherid" />
+							<p id="teacherError" class="error-message"></p>
+						</div>
+						<input type="hidden" name="createdBy" id="createdBy"
+							th:value="${userDetails.teacherid}" /> <input type="hidden"
+							name="modifiedBy" id="modifiedBy"
+							th:value="${userDetails.teacherid}" />
+						<button type="submit" class="btn btn-custom">Add
+							Timetable</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="editTimetableModal" tabindex="-1"
+		aria-labelledby="editTimetableModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="editTimetableModalLabel">Edit
+						Timetable</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<i class="fa fa-times"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form class="row mb-3" id="editTimetableForm"
+						th:action="@{/updateTimetables}" method="post"
+						onsubmit="return validateForm('edit')">
+						<input type="hidden" id="editTimetable" name="timetableid" /> <input
+							type="hidden" id="editProgram" name="program" /><input
+							type="hidden" id="editSemester" name="semester" /> <input
+							type="hidden" id="editDay" name="day" />
+						<div class="col-md-12">
+							<label for="subject" class="col-md-12 mb-3"><i
+								class="fas fa-book-open"></i>Subject</label> <select
+								id="editSubjectDropdown" class="form-control" name="subject">
+								<option value="">Select Subject</option>
+
+							</select> <input type="hidden" id="editSubjectid" name="subjectid" />
+							<p id="editSubjectError" class="error-message"></p>
+						</div>
+
+						<div class="col-md-6">
+							<label for="startTime"><i class="fas fa-hourglass-start"></i>Start
+								Time</label> <input type="time" class="form-control" id="editStartTime"
+								name="startTime" />
+							<p id="editStartTimeError" class="error-message"></p>
+						</div>
+						<div class="col-md-6">
+							<label for="endTime"><i class="fas fa-hourglass-end"></i>End
+								Time</label> <input type="time" class="form-control" id="editEndTime"
+								name="endTime" />
+							<p id="editEndTimeError" class="error-message"></p>
+						</div>
+						<div class="col-md-12">
+							<label for="teacher" class="col-md-12 mb-3"><i
+								class="fas fa-chalkboard-teacher"></i>Teacher</label> <select
+								id="editTeacher" class="form-control" name="teacher">
+								<option value="">Select Teacher</option>
+								<option th:each="teacher : ${teachers}"
+									th:if="${teacher.active}" th:value="${teacher.teacherid}"
+									th:text="${teacher.fname + ' ' + (teacher.mname != null ? teacher.mname + ' ' : '') + teacher.lname}"></option>
+							</select> <input type="hidden" id="editTeacherid" name="teacherid" />
+							<p id="editTeacherError" class="error-message"></p>
+						</div>
+						<input type="hidden" name="modifiedBy" id="modifiedBy"
+							th:value="${userDetails.teacherid}" />
+						<div class="col-md-12">
+
+							<button type="submit" class="btn btn-custom">Edit
+								Timetable</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<script>
+function validateSubject(type) {
+    const subject = document.getElementById(type === "add" ? "subjectDropdown" : "editSubjectDropdown").value;
+    const errorElement = document.getElementById(type === "add" ? "subjectError" : "editSubjectError");
+    if (!subject) {
+        errorElement.textContent = "Please select a subject";
+        return false;
+    } else {
+        errorElement.textContent = "";
+        return true;
+    }
+}
+
+function validateTeacher(type) {
+    const teacher = document.getElementById(type === "add" ? "teacher" : "editTeacher").value;
+    const errorElement = document.getElementById(type === "add" ? "teacherError" : "editTeacherError");
+    if (!teacher) {
+        errorElement.textContent = "Please select a teacher";
+        return false;
+    } else {
+        errorElement.textContent = "";
+        return true;
+    }
+}
+
+function validateStartTime(type) {
+    const startTime = document.getElementById(type === "add" ? "startTime" : "editStartTime").value;
+    const errorElement = document.getElementById(type === "add" ? "startTimeError" : "editStartTimeError");
+    if (!startTime) {
+        errorElement.textContent = "Please enter start time";
+        return false;
+    }
+
+    const startTimeHour = parseInt(startTime.split(":")[0], 10);
+    if (startTimeHour < 8) {
+        errorElement.textContent = "Start time must be 8:00 AM or later";
+        return false;
+    }
+
+    errorElement.textContent = "";
+    return true;
+}
+
+function validateEndTime(type) {
+    const startTime = document.getElementById(type === "add" ? "startTime" : "editStartTime").value;
+    const endTime = document.getElementById(type === "add" ? "endTime" : "editEndTime").value;
+    const errorElement = document.getElementById(type === "add" ? "endTimeError" : "editEndTimeError");
+    if (!endTime) {
+        errorElement.textContent = "Please enter end time";
+        return false;
+    } 
+    const startTimeDate = new Date(`1970-01-01T${startTime}:00`);
+    const endTimeDate = new Date(`1970-01-01T${endTime}:00`);
+
+    if (startTime && endTimeDate <= startTimeDate) {
+        errorElement.textContent = "End time must be after start time";
+        return false;
+    }
+
+    const endTimeHour = parseInt(endTime.split(":")[0], 10);
+    if (endTimeHour > 18) {
+        errorElement.textContent = "End time must be 18:00 PM or earlier";
+        return false;
+    }
+
+    const timeDifference = (endTimeDate - startTimeDate) / (1000 * 60); 
+    if (timeDifference !== 60) {
+        errorElement.textContent = "Start and End time must be 1 hour apart";
+        return false;
+    }
+
+    errorElement.textContent = "";
+    return true;
+}
+
+function validateForm(type) {
+    let isValid = true;
+
+    if (!validateSubject(type)) isValid = false;
+    if (!validateTeacher(type)) isValid = false;
+    if (!validateStartTime(type)) isValid = false;
+    if (!validateEndTime(type)) isValid = false;
+
+    return isValid;
+}
+
+document.getElementById("subjectDropdown").addEventListener("blur", function () {
+    validateSubject("add");
+});
+document.getElementById("teacher").addEventListener("blur", function () {
+    validateTeacher("add");
+});
+document.getElementById("startTime").addEventListener("blur", function () {
+    validateStartTime("add");
+});
+document.getElementById("endTime").addEventListener("blur", function () {
+    validateEndTime("add");
+});
+
+document.getElementById("editSubjectDropdown").addEventListener("blur", function () {
+    validateSubject("edit");
+});
+document.getElementById("editTeacher").addEventListener("blur", function () {
+    validateTeacher("edit");
+});
+document.getElementById("editStartTime").addEventListener("blur", function () {
+    validateStartTime("edit");
+});
+document.getElementById("editEndTime").addEventListener("blur", function () {
+    validateEndTime("edit");
+});
+
+</script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+  function closeTimetableContent() {
+    document.getElementById('timetableContent').style.display = 'none';
+    document.getElementById('timetable').style.display = 'block';
+    
+    window.location.reload();  
+  }
+</script>
+	<script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const timetableBody = document.getElementById("assign-timetable-body");
+        const programIdInput = document.querySelector("[data-program-id]");
+        const semesterIdInput = document.querySelector("[data-semester-id]");
+    
+        const programId = programIdInput
+          ? programIdInput.getAttribute("data-program-id")
+          : null;
+        const semesterId = semesterIdInput
+          ? semesterIdInput.getAttribute("data-semester-id")
+          : null;
+          
+        if (!programId || !semesterId) {
+          console.error("Program ID or Semester ID is missing.");
+          return;
+        }
+
+        function createTimetable() {
+          const times = [
+            "8:00",
+            "9:00",
+            "10:00",
+            "11:00",
+            "12:00",
+            "13:00",
+            "14:00",
+            "15:00",
+            "16:00",
+            "17:00",
+          ];
+          const days = [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ];
+
+          times.forEach((time) => {
+            const row = document.createElement("tr");
+            const timeCell = document.createElement("td");
+            timeCell.textContent = time;
+            timeCell.style.borderRight = "2px solid #dddddd";
+            row.appendChild(timeCell);
+
+            days.forEach((day) => {
+            	  const cell = document.createElement("td");
+            	  cell.dataset.time = time.padStart(5, "0"); 
+            	  cell.dataset.day = day;
+            	  cell.addEventListener("click", () =>
+            	    openAddTimetableModal(programId, semesterId, day, time, cell)
+            	  );
+            	  row.appendChild(cell);
+            	});
+
+            timetableBody.appendChild(row);
+          });
+        }
+
+        createTimetable();
+        fetchTimetableData(programId, semesterId);
+      });
+
+      function openAddTimetableModal(program, semester, day, time) {
+    	   
+
+    	    const formattedTime = formatTime(time);
+    	    const timePattern = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+    	    const startTimeInput = document.getElementById("startTime");
+    	    const startTimeError = document.getElementById("startTimeError");
+
+    	    if (formattedTime && timePattern.test(formattedTime)) {
+    	        if (startTimeInput) {
+    	            startTimeInput.value = formattedTime;
+    	        } else {
+    	            console.error("Element with ID 'startTime' not found.");
+    	        }
+    	        if (startTimeError) {
+    	            startTimeError.innerText = "";
+    	        } else {
+    	            console.error("Element with ID 'startTimeError' not found.");
+    	        }
+    	    } else {
+    	        console.error("Invalid time format. Expected HH:MM.");
+    	        if (startTimeInput) {
+    	            startTimeInput.value = "00:00";
+    	        }
+    	        if (startTimeError) {
+    	            startTimeError.innerText = "Please enter a valid time in HH:MM format.";
+    	        }
+    	    }
+
+    	    const modalLabel = document.getElementById("addTimetableModalLabel");
+    	    if (modalLabel) {
+    	        modalLabel.innerText = `Add Lecture of ${day} at ${formattedTime}`;
+    	    } else {
+    	        console.error("Element with ID 'addTimetableModalLabel' not found.");
+    	    }
+
+    	    const dayInput = document.getElementById("day");
+    	    if (dayInput) {
+    	        dayInput.value = day;
+    	    } else {
+    	        console.error("Element with ID 'day' not found.");
+    	    }
+    	    
+    	    const programIdInput = document.querySelector("[data-program-id]");
+            const programId = programIdInput
+              ? programIdInput.getAttribute("data-program-id")
+              : null;
+           
+    	    if (programIdInput) {
+    	    	programIdInput.value = programId;
+    	    } else {
+    	        console.error("Element with ID 'program' not found.");
+    	    }
+    	    
+    	    const semesterIdInput = document.querySelector("[data-semester-id]");
+    	    const semesterId = semesterIdInput
+            ? semesterIdInput.getAttribute("data-semester-id")
+            : null;
+      	
+    	    if (semesterIdInput) {
+    	    	semesterIdInput.value = semesterId;
+    	    } else {
+    	        console.error("Element with ID 'semester' not found.");
+    	    }
+    	        
+    	
+
+    	    const modalElement = document.getElementById("addTimetableModal");
+    	    if (modalElement) {
+    	        const modal = new bootstrap.Modal(modalElement, {});
+    	        modal.show();
+    	    } else {
+    	        console.error("Element with ID 'addTimetableModal' not found.");
+    	    }
+    	}
+
+      function formatTime(time) {
+        const timeParts = time.split(":");
+        const hour = timeParts[0].padStart(2, "0");
+        const minute = timeParts[1];
+
+        return `${hour}:${minute}`;
+      }
+
+      async function getTeacherIdFromName(teacherName) {
+    	    try {
+    	        const departmentResponse = await fetch('/api/user/department');
+    	        if (!departmentResponse.ok) {
+    	            throw new Error("Failed to fetch department details.");
+    	        }
+
+    	        const departmentData = await departmentResponse.json();
+    	        const departmentId = departmentData.departmentId;
+
+    	        if (!departmentId) {
+    	            console.error("Department ID not found for the logged-in user.");
+    	            return null;
+    	        }
+
+    	        const response = await fetch(`/api/teachers/${departmentId}`);
+    	        if (!response.ok) {
+    	            throw new Error("Failed to fetch teachers.");
+    	        }
+
+    	        const teachers = await response.json();
+    	    
+
+    	        if (!teachers || teachers.length === 0) {
+    	        
+    	            return null;
+    	        }
+
+    	        const teacher = teachers.find(
+    	        	    (t) => t.name && t.name.trim().toLowerCase().includes(teacherName.trim().toLowerCase())
+    	        	);
+
+    	        	if (teacher) {
+    	        
+    	        	    return teacher.teacherid;
+    	        	} else {
+    	        	    console.error(`Teacher not found with name: ${teacherName}`);
+    	        	    return null;
+    	        	}
+
+    	    } catch (error) {
+    	        console.error("Error fetching teacher data:", error);
+    	        return null;
+    	    }
+    	}
+      
+      async function getSubjectIdFromName(subjectName, programId, semesterId) {
+    	    try {
+    	        if (!programId) {
+    	            console.error("Program ID is required.");
+    	            return null;
+    	        }
+
+    	        if (!semesterId) {
+    	            console.error("Semester ID is required.");
+    	            return null;
+    	        }
+
+    	        const response = await fetch(`/api/subjects/${programId}/${semesterId}`);
+    	        if (!response.ok) {
+    	            throw new Error("Failed to fetch subjects.");
+    	        }
+
+    	        const subjects = await response.json();
+    	     
+
+    	        if (!subjects || subjects.length === 0) {
+    	          
+    	            return null;
+    	        }
+
+    	        const subject = subjects.find(
+    	            (s) => s.name && s.name.trim().toLowerCase() === subjectName.trim().toLowerCase()
+    	        );
+
+    	        if (subject) {
+    	   
+    	            return subject.subjectid;
+    	        } else {
+    	            console.error(`Subject not found with name: ${subjectName}`);
+    	            return null;
+    	        }
+
+    	    } catch (error) {
+    	        console.error("Error fetching subject data:", error);
+    	        return null;
+    	    }
+    	}
+
+    	async function openEditTimetableModal(event, timetableId, subjectCode, startTime, endTime, teacherName, programId, semesterId, day) {
+    	    event.stopPropagation();
+
+    	    
+    	    
+    	    const teacherId = await getTeacherIdFromName(teacherName);
+            const subjectId = await getSubjectIdFromName(subjectCode, programId, semesterId);
+            
+    	    if (teacherId === null) {
+    	        console.error("Teacher ID could not be found.");
+    	        return;
+    	    }
+    	    if (subjectId === null) {
+    	        console.error("Subject ID could not be found.");
+    	        return;
+    	    }
+
+    	    const editTimetableElement = document.getElementById("editTimetable");
+    	    const editSubjectElement = document.getElementById("editSubjectDropdown");
+    	    const editStartTimeElement = document.getElementById("editStartTime");
+    	    const editEndTimeElement = document.getElementById("editEndTime");
+    	    const editTeacherElement = document.getElementById("editTeacher");
+    	    const editProgramElement = document.getElementById("editProgram");
+    	    const editSemesterElement = document.getElementById("editSemester");
+    	    const editDayElement = document.getElementById("editDay");
+    	  
+
+    	    if (editTimetableElement) {
+    	        editTimetableElement.value = timetableId;
+    	    } else {
+    	        console.error("editTimetable element not found.");
+    	    }
+    	    if (editSubjectElement) {
+    	        editSubjectElement.value = subjectId;
+    	    } else {
+    	        console.error("editSubject element not found.");
+    	    }
+
+    	    if (editStartTimeElement) {
+    	        editStartTimeElement.value = startTime;
+    	    } else {
+    	        console.error("editStartTime element not found.");
+    	    }
+
+    	    if (editEndTimeElement) {
+    	        editEndTimeElement.value = endTime;
+    	    } else {
+    	        console.error("editEndTime element not found.");
+    	    }
+
+    	    if (editTeacherElement) {
+    	        editTeacherElement.value = teacherId;
+    	    } else {
+    	        console.error("editTeacher element not found.");
+    	    }
+
+    	    if (editProgramElement) {
+    	        editProgramElement.value = programId;
+    	    } else {
+    	        console.error("editProgram element not found.");
+    	    }
+
+    	    if (editSemesterElement) {
+    	        editSemesterElement.value = semesterId;  
+    	    } else {
+    	        console.error("editSemester element not found.");
+    	    }
+
+    	    if (editDayElement) {
+    	        editDayElement.value = day;  
+    	    } else {
+    	        console.error("editDay element not found.");
+    	    }
+    	    	    const addTimetableModalElement = document.getElementById("addTimetableModal");
+    	    if (addTimetableModalElement) {
+    	        const addTimetableModalInstance = bootstrap.Modal.getOrCreateInstance(addTimetableModalElement);
+    	        if (addTimetableModalInstance && addTimetableModalElement.classList.contains("show")) {
+    	            addTimetableModalInstance.hide();
+    	        }
+    	    } else {
+    	        console.error("addTimetableModal element not found.");
+    	    }
+
+    	    const editTimetableModalElement = document.getElementById("editTimetableModal");
+    	    if (editTimetableModalElement) {
+    	        const editTimetableModal = new bootstrap.Modal(editTimetableModalElement);
+    	        editTimetableModal.show();
+    	    } else {
+    	        console.error("Edit Timetable Modal element not found.");
+    	    }
+    	}
+
+
+
+      function fetchTimetableData(programId, semesterId) {
+        const url = `/api/timetable/${programId}/${semesterId}`;
+        fetch(url)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            if (data.length === 0) {
+              console.error("No timetable data found.");
+            } else {
+              populateAssignTimetable(data);
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching timetable:", error);
+          
+          });
+      }
+
+      function populateAssignTimetable(data) {
+      
+
+        data.forEach((entry) => {
+          const { timetableId, day, startTime, endTime, subject, programId, semesterId, teacher } = entry;
+
+          const normalizedDay =
+            day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
+          const formattedStartTime = startTime.padStart(5, "0");
+
+          const cells = document.querySelectorAll(
+            `td[data-day="${normalizedDay}"][data-time="${formattedStartTime}"]`
+          );
+        
+
+          cells.forEach((cell) => {
+          
+            cell.innerHTML = `
+	                    <div class="lecture" onclick="openEditTimetableModal(event, '${timetableId}', '${subject}', '${formattedStartTime}', '${endTime}', '${teacher}', '${programId}', '${semesterId}',  '${day}' )">
+	                        <span>${subject}</span>
+	                        <div>${formattedStartTime} to ${endTime}</div>
+	                        <div>${teacher}</div>
+	                    </div>`;
+          });
+        });
+      }
+
+      async function handleShowContent(element) {
+    	    const semesterId = element.getAttribute("data-semester-id");
+    	    const program = element.getAttribute("data-program");
+    	    const programId = element.getAttribute("data-program-id");
+    	    const semester = element.getAttribute("data-semester");
+
+    	    const timetableContent = document.getElementById("timetableContent");
+    	    timetableContent.style.display = "block";
+    	    
+    	    const timetable = document.getElementById("timetable");
+    	    timetable.style.display = "none";
+
+    	    const semesterIdInput = document.getElementById("semester");
+    	    const programIdInput = document.getElementById("program");
+
+    	    if (programIdInput) programIdInput.value = programId;
+    	    if (semesterIdInput) semesterIdInput.value = semesterId;
+
+    	    const titleElement = timetableContent.querySelector(".card-title");
+    	    titleElement.textContent = `${program} ${semester}`;
+
+    	    const timetableBody = document.getElementById("assign-timetable-body");
+    	    const rows = timetableBody.querySelectorAll("tr");
+    	    rows.forEach((row) => {
+    	        const cells = row.querySelectorAll("td");
+    	        cells.forEach((cell, index) => {
+    	            if (index > 0) {
+    	                cell.innerHTML = "";  
+    	            }
+    	        });
+    	    });
+
+    	    try {
+    	        const subjects = await fetchSubjects(programId, semesterId);
+    	        
+    	        if (subjects) {
+    	            populateSubjectDropdown(subjects, "subjectDropdown");
+    	            populateSubjectDropdown(subjects, "editSubjectDropdown");
+    	        }
+
+    	        fetchTimetableData(programId, semesterId);
+
+    	    } catch (error) {
+    	        console.error("Error handling timetable content:", error);
+    	        alert("An error occurred while fetching timetable data.");
+    	    }
+    	}
+
+    	async function fetchSubjects(programId, semesterId) {
+    	    try {
+    	        const response = await fetch(`/api/subjects/${programId}/${semesterId}`);
+    	        const subjects = await response.json();
+
+    	        if (!Array.isArray(subjects)) {
+    	            throw new Error("Invalid subjects format");
+    	        }
+    	        return subjects;
+    	    } catch (error) {
+    	        console.error("Error fetching subjects:", error);
+    	        alert("Failed to load subjects.");
+    	        return null;
+    	    }
+    	}
+
+    	function populateSubjectDropdown(subjects, dropdownId) {
+    	    const subjectDropdown = document.getElementById(dropdownId);
+    	    if (subjectDropdown) {
+    	        subjectDropdown.innerHTML = '<option value="">Select Subject</option>';
+
+    	        subjects.forEach(subject => {
+    	            const option = document.createElement("option");
+    	            option.value = subject.subjectid;
+    	            option.textContent = subject.name;
+    	            subjectDropdown.appendChild(option);
+    	        });
+    	    }
+    	}
+
+      
+    </script>
+
+	<script>
+	document.addEventListener("DOMContentLoaded", () => {
+	    const teacherId = document.getElementById("teacherId").value; 
+	    if (teacherId) {
+	        fetchTeacherTimetable(teacherId);
+	    }
+	});
+
+	async function fetchTeacherTimetable(teacherId) {
+	    const url = `/api/timetable/teacher/${teacherId}`;
+	    try {
+	        const response = await fetch(url);
+	        if (!response.ok) {
+	            throw new Error(`HTTP error! Status: ${response.status}`);
+	        }
+	        const data = await response.json(); 
+	        populateTimetable(data); 
+	    } catch (error) {
+	        console.error("Error fetching timetable:", error);
+	        alert("Failed to load timetable.");
+	    }
+	}
+
+	function populateTimetable(data) {
+	    const timetableBody = document.getElementById("timetable-body");
+	    timetableBody.innerHTML = ""; // Clear existing rows
+
+	    const times = [
+            "8:00",
+            "9:00",
+            "10:00",
+            "11:00",
+            "12:00",
+            "13:00",
+            "14:00",
+            "15:00",
+            "16:00",
+            "17:00",
+          ];
+          const days = [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ];
+
+	    times.forEach((time) => {
+	        const row = document.createElement("tr");
+	        const timeCell = document.createElement("td");
+	        timeCell.textContent = time;
+	        timeCell.style.borderRight = "2px solid #dddddd";	
+	        row.appendChild(timeCell);
+
+	        days.forEach((day) => {
+	            const cell = document.createElement("td");
+	            cell.dataset.time = time.padStart(5, "0");
+	            cell.dataset.day = day;
+	            row.appendChild(cell);
+	        });
+
+	        timetableBody.appendChild(row);
+	    });
+
+	    data.forEach((entry) => {
+	        const { day, startTime, program, semester, subject, teacher } = entry;
+	        const normalizedDay = day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
+	        const formattedStartTime = startTime.padStart(5, "0");
+
+	        const cell = document.querySelector(
+	        		`td[data-day="${normalizedDay}"][data-time="${formattedStartTime}"]`
+
+	        	);
+
+	        if (cell) {
+	            cell.innerHTML = `
+	                <div class="lecture">
+	                    <span>${subject}</span>
+	                    <div>${formattedStartTime} - ${entry.endTime}</div>
+	                    <div style="font-weight:600;">${program} ${semester}</div>
+	                </div>`;
+	        }
+	    });
+	}
+
+
+    </script>
+
+	<script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+	<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="assets/vendor/chart.js/chart.umd.js"></script>
+	<script src="assets/vendor/echarts/echarts.min.js"></script>
+	<script src="assets/vendor/quill/quill.js"></script>
+	<script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+	<script src="assets/vendor/tinymce/tinymce.min.js"></script>
+	<script src="assets/vendor/php-email-form/validate.js"></script>
+
+	<script src="assets/js/main.js"></script>
+</body>
+</html>

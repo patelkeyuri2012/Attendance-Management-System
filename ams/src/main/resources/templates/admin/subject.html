@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html
+  class="loading"
+  lang="en"
+  data-textdirection="ltr"
+  xmlns:th="http://www.thymeleaf.org"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Attendance Management System</title>
+    <link href="assets/img/favicon.png" rel="icon" />
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+
+    <link href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+      rel="stylesheet"
+    />
+
+    <link
+      href="assets/vendor/bootstrap/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="assets/vendor/bootstrap-icons/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet" />
+    <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet" />
+    <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet" />
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet" />
+    <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet" />
+
+    <link href="assets/css/style.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <div th:replace="~{admin/nav :: body}"></div>
+    <main id="main" class="main">
+      <div class="pagetitle">
+        <h1>Subject</h1>
+        <nav>
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+            <li class="breadcrumb-item active">Subject</li>
+          </ol>
+        </nav>
+      </div>
+
+      <section class="class section">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5
+                  class="card-title"
+                  data-bs-toggle="modal"
+                  data-bs-target="#addSubjectModal"
+                  style="cursor: pointer"
+                >
+                  Add Subject
+                </h5>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <table class="table-custom">
+                  <thead>
+                    <tr>
+                      <th scope="col">Subject Code</th>
+                      <th scope="col">Subject</th>
+                      <th scope="col">Semester</th>
+                      <th scope="col">Elective</th>
+                      <th scope="col">Program</th>
+                      <th scope="col">Department</th>
+                      <th scope="col">Faculty</th>
+                      <th scope="col">Details</th>
+                      <th scope="col">Active</th>
+                      <th
+                        scope="col"
+                        style="text-align: right; width: 100px"
+                      ></th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr th:each="subject : ${subjects}">
+                      <td th:text="${subject.subjectcode}"></td>
+                      <td th:text="${subject.subject}"></td>
+                      <td
+                        th:text="${subject.semester.semester}"
+                        th:attr="data-semesterid=${subject.semester.semesterid}"
+                      ></td>
+
+                      <td>
+                        <span
+                          class="badge elective-success"
+                          th:if="${subject.elective}"
+                          >YES</span
+                        >
+                        <span
+                          class="badge elective-danger"
+                          th:unless="${subject.elective}"
+                          >NO</span
+                        >
+                      </td>
+                      <td
+                        th:text="${subject.program.program}"
+                        th:attr="data-programid=${subject.program.programid}"
+                      ></td>
+
+                      <td
+                        th:text="${subject.department.department}"
+                        th:attr="data-departmentid=${subject.department.departmentid}"
+                      ></td>
+
+                      <td
+                        th:text="${subject.faculty.faculty}"
+                        th:attr="data-facultyid=${subject.faculty.facultyid}"
+                      ></td>
+
+                      <td th:text="${subject.details}"></td>
+                      <td>
+                        <span
+                          class="badge badge-success"
+                          th:if="${subject.active}"
+                          >YES</span
+                        >
+                        <span
+                          class="badge badge-danger"
+                          th:unless="${subject.active}"
+                          >NO</span
+                        >
+                      </td>
+                      <td>
+                        <i
+                          class="fas fa-edit"
+                          data-bs-toggle="modal"
+                          th:data-subjectid="${subject.subjectid}"
+                          data-bs-target="#editsubjectModal"
+                        ></i>
+                        <i
+                          class="fas fa-trash-alt"
+                          data-bs-toggle="modal"
+                          th:data-subjectid="${subject.subjectid}"
+                          data-bs-target="#deletesubjectModal"
+                        ></i>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal fade" id="addSubjectModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Subject</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-container">
+              <form
+                id="subjectForm"
+                th:action="@{/addSubjects}"
+                method="post"
+                onsubmit="return validateForm('add')"
+              >
+                <div class="form-group">
+                  <label for="faculty" class="col-md-12 mb-3"
+                    ><i class="fas fa-city"></i> Faculty</label
+                  >
+                  <select id="faculty" name="faculty">
+                    <option value="">Select Faculty</option>
+                    <option
+                      th:each="faculty : ${faculties}"
+                      th:if="${faculty.active}"
+                      th:value="${faculty.facultyid}"
+                      th:text="${faculty.faculty}"
+                    ></option>
+                  </select>
+                  <input type="hidden" id="facultyid" name="facultyid" />
+                  <p id="facultyError" class="error-message"></p>
+                </div>
+
+                <div class="form-group">
+                  <label for="department" class="col-md-12 mb-3"
+                    ><i class="fas fa-building"></i> Department</label
+                  >
+                  <select id="department" name="department" disabled>
+                    <option value="">Select Faculty first</option>
+                  </select>
+                  <input type="hidden" id="departmentid" name="departmentid" />
+                  <p id="departmentError" class="error-message"></p>
+                </div>
+
+                <div class="form-group">
+                  <label for="program" class="col-md-12 mb-3"
+                    ><i class="fas fa-graduation-cap"></i> Program</label
+                  >
+                  <select id="program" name="program" disabled>
+                    <option value="">Select Department first</option>
+                  </select>
+                  <input type="hidden" id="programid" name="programid" />
+                  <p id="programError" class="error-message"></p>
+                </div>
+
+                <div class="form-group">
+                  <label for="semester" class="col-md-12 mb-3"
+                    ><i class="fa fa-book"></i> Semester</label
+                  >
+                  <select id="semester" name="semester" disabled>
+                    <option value="">Select Program first</option>
+                  </select>
+                  <input type="hidden" id="semesterid" name="semesterid" />
+                  <p id="semesterError" class="error-message"></p>
+                </div>
+
+                <div class="form-group">
+                  <label for="subjectcode" class="col-md-12 mb-3"
+                    ><i class="fas fa-book-reader"></i>Subject Code</label
+                  >
+                  <input
+                    type="text"
+                    id="subjectcode"
+                    name="subjectcode"
+                    onblur="validateSubjectCode('add')"
+                  />
+                  <p id="subjectcodeError" class="error-message"></p>
+                </div>
+
+                <div class="form-group">
+                  <label for="subject" class="col-md-12 mb-3"
+                    ><i class="fas fa-book-open"></i>Subject</label
+                  >
+                  <input
+                    type="text"
+                    id="subject"
+                    name="subject"
+                    onblur="validateSubject('add')"
+                  />
+                  <p id="subjectError" class="error-message"></p>
+                </div>
+
+                <div class="form-group mb-4">
+                  <label for="elective"
+                    ><i class="fa fa-cube mb-2"></i>Is Elective Subject?</label
+                  ><br />
+
+                  <div class="custom-checkbox" style="margin-left: 50px">
+                    <input type="checkbox" id="elective" name="elective" />
+                    <label for="elective" class="checkbox-icon"></label>
+                    <label for="elective" style="font-size: 16px"
+                      >Elective</label
+                    >
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="details"
+                    ><i class="fa fa-pencil"></i>Details</label
+                  >
+                  <textarea
+                    name="details"
+                    id="details"
+                    style="height: 100px"
+                    onblur="validateDetails('add')"
+                  ></textarea>
+                  <p id="detailsError" class="error-message"></p>
+                </div>
+
+                <div class="form-group">
+                  <div
+                    class="custom-checkbox"
+                    style="
+                      margin: auto;
+                      justify-content: right;
+                      align-items: center;
+                      display: flex;
+                    "
+                  >
+                    <input type="checkbox" id="active" name="active" checked />
+                    <label for="active" class="checkbox-icon"></label>
+                    <label for="active" style="font-size: 16px">Active</label>
+                  </div>
+                </div>
+                <input
+                  type="hidden"
+                  name="createdBy"
+                  id="createdBy"
+                  th:value="${userDetails.adminid}"
+                />
+                <input
+                  type="hidden"
+                  name="modifiedBy"
+                  id="modifiedBy"
+                  th:value="${userDetails.adminid}"
+                />
+                <div class="form-group mt-3">
+                  <button type="submit" class="btn-submit" id="submitButton">
+                    Add Subject
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="editsubjectModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Subject</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-container">
+              <form
+                id="editSubjectForm"
+                th:action="@{/updateSubjects}"
+                method="post"
+                onsubmit="return validateForm('edit')"
+              >
+                <input type="hidden" id="editsubjectid" name="subjectid" />
+
+                <div class="form-group">
+                  <label for="editfacultyName" class="col-md-12 mb-3"
+                    ><i class="fas fa-city"></i> Faculty</label
+                  >
+                  <select
+                    id="editfacultyName"
+                    name="faculty"
+                    onchange="loadDepartments(loadPrograms)"
+                  >
+                    <option value="">Select Faculty</option>
+                    <option
+                      th:each="faculty : ${faculties}"
+                      th:if="${faculty.active}"
+                      th:value="${faculty.facultyid}"
+                      th:text="${faculty.faculty}"
+                    ></option>
+                  </select>
+                  <input type="hidden" id="facultyid" name="facultyid" />
+                  <p id="editfacultyError" class="error-message"></p>
+                </div>
+
+                <div class="form-group">
+                  <label for="editdepartmentName" class="col-md-12 mb-3"
+                    ><i class="fas fa-building"></i> Department</label
+                  >
+                  <select
+                    id="editdepartmentName"
+                    name="department"
+                    onchange="loadPrograms(loadSemesters)"
+                  >
+                    <option value="">Select Department</option>
+                  </select>
+                  <input type="hidden" id="departmentid" name="departmentid" />
+                  <p id="editdepartmentError" class="error-message"></p>
+                </div>
+
+                <div class="form-group">
+                  <label for="editprogramName" class="col-md-12 mb-3"
+                    ><i class="fas fa-graduation-cap"></i> Program</label
+                  >
+                  <select
+                    id="editprogramName"
+                    name="program"
+                    onchange="loadSemesters()"
+                  >
+                    <option value="">Select Program</option>
+                  </select>
+                  <input type="hidden" id="programid" name="programid" />
+                  <p id="editprogramError" class="error-message"></p>
+                </div>
+
+                <div class="form-group">
+                  <label for="editsemesterName" class="col-md-12 mb-3"
+                    ><i class="fa fa-book"></i> Semester</label
+                  >
+                  <select id="editsemesterName" name="semester">
+                    <option value="">Select Semester</option>
+                  </select>
+                  <input type="hidden" id="semesterid" name="semesterid" />
+                  <p id="editsemesterError" class="error-message"></p>
+                </div>
+
+                <div class="form-group">
+                  <label for="editsubjectCode" class="col-md-12 mb-3"
+                    ><i class="fas fa-book-reader"></i>SubjectCode</label
+                  >
+                  <input
+                    type="text"
+                    id="editsubjectCode"
+                    name="subjectcode"
+                    onblur="validateSubjectCode('edit')"
+                  />
+                  <p id="editsubjectCodeError" class="error-message"></p>
+                </div>
+
+                <div class="form-group">
+                  <label for="editsubjectName" class="col-md-12 mb-3"
+                    ><i class="fas fa-book-open"></i>Subject</label
+                  >
+                  <input
+                    type="text"
+                    id="editsubjectName"
+                    name="subject"
+                    onblur="validateSubject('edit')"
+                  />
+                  <p id="editsubjectError" class="error-message"></p>
+                </div>
+
+                <div class="form-group mb-4">
+                  <label for="editsubjectElective"
+                    ><i class="fa fa-cube mb-2"></i>Is Elective Subject?</label
+                  ><br />
+
+                  <div class="custom-checkbox" style="margin-left: 50px">
+                    <input
+                      type="checkbox"
+                      id="editsubjectElective"
+                      name="elective"
+                    />
+                    <label
+                      for="editsubjectElective"
+                      class="checkbox-icon"
+                    ></label>
+                    <label for="editsubjectElective" style="font-size: 16px"
+                      >Elective</label
+                    >
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="editsubjectDetails"
+                    ><i class="fa fa-pencil"></i>Details</label
+                  >
+                  <textarea
+                    name="details"
+                    id="editsubjectDetails"
+                    style="height: 100px"
+                    onblur="validateDetails('edit')"
+                  ></textarea>
+                  <p id="editdetailsError" class="error-message"></p>
+                </div>
+                <div class="form-group">
+                  <div
+                    class="custom-checkbox"
+                    style="
+                      margin: auto;
+                      justify-content: right;
+                      align-items: center;
+                      display: flex;
+                    "
+                  >
+                    <input
+                      type="checkbox"
+                      id="editsubjectActive"
+                      name="active"
+                      value="true"
+                      checked
+                    />
+                    <label
+                      for="editsubjectActive"
+                      class="checkbox-icon"
+                    ></label>
+                    <label for="editsubjectActive" style="font-size: 16px"
+                      >Active</label
+                    >
+                  </div>
+                </div>
+                <input
+                  type="hidden"
+                  name="modifiedBy"
+                  id="modifiedBy"
+                  th:value="${userDetails.adminid}"
+                />
+                <div class="form-group mt-3">
+                  <button type="submit" class="btn-submit" id="editButton">
+                    Edit Subject
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="deletesubjectModal" tabindex="-1">
+      <div class="modal-dialog modal-confirm">
+        <div class="modal-content">
+          <div class="modal-header flex-column">
+            <h4>Are you sure?</h4>
+          </div>
+          <div class="modal-body">
+            <p>
+              Do you really want to delete this subject?<br />
+              This process cannot be undone.
+            </p>
+          </div>
+          <div class="modal-footer justify-content-center">
+            <form
+              id="deletesubjectForm"
+              th:action="@{/deleteSubjects}"
+              method="post"
+            >
+              <input type="hidden" id="deletesubjectid" name="subjectId" />
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger"
+                onclick="deleteSubject()"
+              >
+                Delete
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        $("#faculty").change(function () {
+          var facultyId = $(this).val();
+          var departmentDropdown = $("#department");
+
+          if (facultyId) {
+            $.ajax({
+              type: "GET",
+              url: "/api/departments/" + facultyId,
+              success: function (data) {
+                departmentDropdown.empty();
+                departmentDropdown.append(
+                  '<option value="">Select Department</option>'
+                );
+                $.each(data, function (index, department) {
+                  departmentDropdown.append(
+                    '<option value="' +
+                      department.departmentid +
+                      '">' +
+                      department.department +
+                      "</option>"
+                  );
+                });
+                departmentDropdown.prop("disabled", false);
+                $("#program")
+                  .prop("disabled", true)
+                  .empty()
+                  .append('<option value="">Select Department first</option>');
+                $("#semester")
+                  .prop("disabled", true)
+                  .empty()
+                  .append('<option value="">Select Program first</option>');
+              },
+              error: function () {
+                console.error("Error fetching departments");
+              },
+            });
+          } else {
+            departmentDropdown
+              .empty()
+              .append('<option value="">Select Faculty first</option>');
+            departmentDropdown.prop("disabled", true);
+            $("#program")
+              .prop("disabled", true)
+              .empty()
+              .append('<option value="">Select Department first</option>');
+            $("#semester")
+              .prop("disabled", true)
+              .empty()
+              .append('<option value="">Select Program first</option>');
+          }
+        });
+
+        $("#department").change(function () {
+          var departmentId = $(this).val();
+          var programDropdown = $("#program");
+
+          if (departmentId) {
+            $.ajax({
+              type: "GET",
+              url: "/api/programs/" + departmentId,
+              success: function (data) {
+                programDropdown.empty();
+                programDropdown.append(
+                  '<option value="">Select Program</option>'
+                );
+                $.each(data, function (index, program) {
+                  programDropdown.append(
+                    '<option value="' +
+                      program.programid +
+                      '">' +
+                      program.program +
+                      "</option>"
+                  );
+                });
+                programDropdown.prop("disabled", false);
+                $("#semester")
+                  .prop("disabled", true)
+                  .empty()
+                  .append('<option value="">Select Program first</option>');
+              },
+              error: function () {
+                console.error("Error fetching programs");
+              },
+            });
+          } else {
+            programDropdown
+              .empty()
+              .append('<option value="">Select Department first</option>');
+            programDropdown.prop("disabled", true);
+            $("#semester")
+              .prop("disabled", true)
+              .empty()
+              .append('<option value="">Select Program first</option>');
+          }
+        });
+
+        $(document).ready(function () {
+          $("#program").change(function () {
+            var programId = $(this).val();
+            var semesterDropdown = $("#semester");
+
+            if (programId) {
+              $.ajax({
+                type: "GET",
+                url: "/api/semester",
+                data: { programId: programId }, 
+                success: function (data) {
+                  semesterDropdown.empty();
+                  semesterDropdown.append(
+                    '<option value="">Select Semester</option>'
+                  );
+                  $.each(data, function (index, semester) {
+                    semesterDropdown.append(
+                      '<option value="' +
+                        semester.semesterid +
+                        '">' +
+                        semester.semester +
+                        "</option>"
+                    );
+                  });
+                  semesterDropdown.prop("disabled", false);
+                },
+                error: function () {
+                  console.error("Error fetching semesters");
+                },
+              });
+            } else {
+              semesterDropdown
+                .empty()
+                .append('<option value="">Select Program first</option>');
+              semesterDropdown.prop("disabled", true);
+            }
+          });
+        });
+      });
+
+      function loadDepartments(selectedDepartmentId, callback) {
+        var facultyId = $("#editfacultyName").val();
+        if (facultyId) {
+          $.ajax({
+            url: "/api/departments/" + facultyId,
+            type: "GET",
+            data: { facultyId: facultyId },
+            success: function (data) {
+              var departmentSelect = $("#editdepartmentName");
+              departmentSelect.empty();
+              departmentSelect.append(
+                '<option value="">Select Department</option>'
+              );
+              $.each(data, function (index, department) {
+                departmentSelect.append(
+                  '<option value="' +
+                    department.departmentid +
+                    '">' +
+                    department.department +
+                    "</option>"
+                );
+              });
+              if (selectedDepartmentId) {
+                departmentSelect.val(selectedDepartmentId);
+              }
+              if (callback) callback();
+            },
+            error: function () {
+              alert("Error loading departments");
+            },
+          });
+        } else {
+          $("#editdepartmentName")
+            .empty()
+            .append('<option value="">Select Department</option>');
+        }
+      }
+
+      function loadPrograms(selectedProgramId, callback) {
+        var departmentId = $("#editdepartmentName").val();
+        if (departmentId) {
+          $.ajax({
+            url: "/api/programs/" + departmentId,
+            type: "GET",
+            data: { departmentId: departmentId },
+            success: function (data) {
+              var programSelect = $("#editprogramName");
+              programSelect.empty();
+              programSelect.append('<option value="">Select Program</option>');
+              $.each(data, function (index, program) {
+                programSelect.append(
+                  '<option value="' +
+                    program.programid +
+                    '">' +
+                    program.program +
+                    "</option>"
+                );
+              });
+              if (selectedProgramId) {
+                programSelect.val(selectedProgramId);
+              }
+              if (callback) callback();
+            },
+            error: function () {
+              alert("Error loading programs");
+            },
+          });
+        } else {
+          $("#editprogramName")
+            .empty()
+            .append('<option value="">Select Program</option>');
+        }
+      }
+
+      function loadSemesters(selectedSemesterId, callback) {
+        var programId = $("#editprogramName").val();
+        if (programId) {
+          $.ajax({
+            url: "/api/semester",
+            type: "GET",
+            data: { programId: programId },
+            success: function (data) {
+              var semesterSelect = $("#editsemesterName");
+              semesterSelect.empty();
+              semesterSelect.append(
+                '<option value="">Select Semester</option>'
+              );
+              $.each(data, function (index, semester) {
+                semesterSelect.append(
+                  '<option value="' +
+                    semester.semesterid +
+                    '">' +
+                    semester.semester +
+                    "</option>"
+                );
+              });
+              if (selectedSemesterId) {
+                semesterSelect.val(selectedSemesterId);
+              }
+              if (callback) callback();
+            },
+            error: function () {
+              alert("Error loading semesters");
+            },
+          });
+        } else {
+          $("#editsemesterName")
+            .empty()
+            .append('<option value="">Select Semester</option>');
+        }
+      }
+    </script>
+
+    <script>
+      function validateFacultyDropdown(type) {
+        const dropdown = document.getElementById(
+          type === "add" ? "faculty" : "editfacultyName"
+        );
+        const errorElement = document.getElementById(
+          type === "add" ? "facultyError" : "editfacultyError"
+        );
+
+        if (dropdown.value === "") {
+          errorElement.textContent = "Please select a faculty";
+          return false;
+        } else {
+          errorElement.textContent = "";
+          return true;
+        }
+      }
+
+      function validateDepartmentDropdown(type) {
+        const dropdown = document.getElementById(
+          type === "add" ? "department" : "editdepartmentName"
+        );
+        const errorElement = document.getElementById(
+          type === "add" ? "departmentError" : "editdepartmentError"
+        );
+
+        if (dropdown.value === "") {
+          errorElement.textContent = "Please select a department";
+          return false;
+        } else {
+          errorElement.textContent = "";
+          return true;
+        }
+      }
+
+      function validateProgramDropdown(type) {
+        const dropdown = document.getElementById(
+          type === "add" ? "program" : "editprogramName"
+        );
+        const errorElement = document.getElementById(
+          type === "add" ? "programError" : "editprogramError"
+        );
+
+        if (dropdown.value === "") {
+          errorElement.textContent = "Please select a program";
+          return false;
+        } else {
+          errorElement.textContent = "";
+          return true;
+        }
+      }
+
+      function validateSemesterDropdown(type) {
+        const dropdown = document.getElementById(
+          type === "add" ? "semester" : "editsemesterName"
+        );
+        const errorElement = document.getElementById(
+          type === "add" ? "semesterError" : "editsemesterError"
+        );
+
+        if (dropdown.value === "") {
+          errorElement.textContent = "Please select a semester";
+          return false;
+        } else {
+          errorElement.textContent = "";
+          return true;
+        }
+      }
+
+      function validateSubjectCode(type) {
+        const subjectcode = document.getElementById(
+          type === "add" ? "subjectcode" : "editsubjectCode"
+        ).value;
+        const errorElement = document.getElementById(
+          type === "add" ? "subjectcodeError" : "editsubjectCodeError"
+        );
+
+        if (subjectcode.length < 3 || subjectcode.length > 255) {
+          errorElement.textContent = "Please enter a meaningful subjectcode";
+        } else {
+          errorElement.textContent = "";
+        }
+      }
+
+      function validateSubject(type) {
+        const subject = document.getElementById(
+          type === "add" ? "subject" : "editsubjectName"
+        ).value;
+        const errorElement = document.getElementById(
+          type === "add" ? "subjectError" : "editsubjectError"
+        );
+
+        if (subject.length < 5 || subject.length > 255) {
+          errorElement.textContent = "Please enter a meaningful subject";
+        } else {
+          errorElement.textContent = "";
+        }
+      }
+
+      function validateDetails(type) {
+        const details = document.getElementById(
+          type === "add" ? "details" : "editsubjectDetails"
+        ).value;
+        const errorElement = document.getElementById(
+          type === "add" ? "detailsError" : "editdetailsError"
+        );
+
+        if (details.length < 10 || details.length > 255) {
+          errorElement.textContent =
+            "Please enter meaningful details of subject";
+        } else {
+          errorElement.textContent = "";
+        }
+      }
+
+      function validateForm(type) {
+        const subjectcode = document.getElementById(
+          type === "add" ? "subjectcode" : "editsubjectCode"
+        ).value;
+        const subject = document.getElementById(
+          type === "add" ? "subject" : "editsubjectName"
+        ).value;
+        const details = document.getElementById(
+          type === "add" ? "details" : "editsubjectDetails"
+        ).value;
+        const dropdownFacultyValid = validateFacultyDropdown(type);
+        const dropdownDepartmentValid = validateDepartmentDropdown(type);
+        const dropdownProgramValid = validateProgramDropdown(type);
+        const dropdownSemesterValid = validateSemesterDropdown(type);
+        let isValid = true;
+
+        if (subjectcode.length < 3 || subjectcode.length > 255) {
+          validateSubjectCode(type);
+          isValid = false;
+        }
+
+        if (subject.length < 5 || subject.length > 255) {
+          validateSubject(type);
+          isValid = false;
+        }
+
+        if (details.length < 10 || details.length > 255) {
+          validateDetails(type);
+          isValid = false;
+        }
+
+        return (
+          isValid &&
+          dropdownFacultyValid &&
+          dropdownDepartmentValid &&
+          dropdownProgramValid &&
+          dropdownSemesterValid
+        );
+      }
+
+      document
+        .getElementById("faculty")
+        .addEventListener("change", function () {
+          var selectedFacultyId = this.value;
+          document.getElementById("facultyid").value = selectedFacultyId;
+        });
+      document
+        .getElementById("department")
+        .addEventListener("change", function () {
+          var selectedDepartmentId = this.value;
+          document.getElementById("departmentid").value = selectedDepartmentId;
+        });
+      document
+        .getElementById("program")
+        .addEventListener("change", function () {
+          var selectedProgramId = this.value;
+          document.getElementById("programid").value = selectedProgramId;
+        });
+      document
+        .getElementById("semester")
+        .addEventListener("change", function () {
+          var selectedSemesterId = this.value;
+          document.getElementById("semesterid").value = selectedSemesterId;
+        });
+
+      document
+        .getElementById("subjectcode")
+        .addEventListener("blur", function () {
+          validateSubjectCode("add");
+        });
+      document.getElementById("subject").addEventListener("blur", function () {
+        validateSubject("add");
+      });
+      document.getElementById("details").addEventListener("blur", function () {
+        validateDetails("add");
+      });
+      document
+        .getElementById("editsubjectCode")
+        .addEventListener("blur", function () {
+          validateSubjectCode("edit");
+        });
+      document
+        .getElementById("editsubjectName")
+        .addEventListener("blur", function () {
+          validateSubject("edit");
+        });
+      document
+        .getElementById("editsubjectDetails")
+        .addEventListener("blur", function () {
+          validateDetails("edit");
+        });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        var editsubjectModal = document.getElementById("editsubjectModal");
+
+        editsubjectModal.addEventListener("show.bs.modal", function (event) {
+          var button = event.relatedTarget;
+          var editsubjectid = button.getAttribute("data-subjectid");
+          var editeditsubjectid = document.getElementById("editsubjectid");
+          var editfacultyName = document.getElementById("editfacultyName");
+          var editdepartmentName =
+            document.getElementById("editdepartmentName");
+          var editprogramName = document.getElementById("editprogramName");
+          var editsemesterName = document.getElementById("editsemesterName");
+          var editsubjectCode = document.getElementById("editsubjectCode");
+          var editsubjectName = document.getElementById("editsubjectName");
+          var editsubjectDetails =
+            document.getElementById("editsubjectDetails");
+          var editsubjectElective = document.getElementById(
+            "editsubjectElective"
+          );
+          var editsubjectActive = document.getElementById("editsubjectActive");
+
+          editeditsubjectid.value = editsubjectid;
+
+          var row = button.closest("tr");
+          editsubjectCode.value = row
+            .querySelector("td:nth-child(1)")
+            .textContent.trim();
+          editsubjectName.value = row
+            .querySelector("td:nth-child(2)")
+            .textContent.trim();
+          editsubjectDetails.value = row
+            .querySelector("td:nth-child(8)")
+            .textContent.trim();
+
+          var semesterId = row
+            .querySelector("td:nth-child(3)")
+            .getAttribute("data-semesterid");
+          var programId = row
+            .querySelector("td:nth-child(5)")
+            .getAttribute("data-programid");
+          var departmentId = row
+            .querySelector("td:nth-child(6)")
+            .getAttribute("data-departmentid");
+          var facultyId = row
+            .querySelector("td:nth-child(7)")
+            .getAttribute("data-facultyid");
+
+          editsubjectElective.checked =
+            row.querySelector(".elective-success") !== null;
+          editsubjectActive.checked =
+            row.querySelector(".badge-success") !== null;
+
+          editfacultyName.value = facultyId;
+
+          loadDepartments(departmentId, function () {
+            editdepartmentName.value = departmentId;
+
+            loadPrograms(programId, function () {
+              editprogramName.value = programId;
+
+              loadSemesters(semesterId, function () {
+                editsemesterName.value = semesterId;
+              });
+            });
+          });
+        });
+
+        var deletesubjectModal = document.getElementById("deletesubjectModal");
+        deletesubjectModal.addEventListener("show.bs.modal", function (event) {
+          var button = event.relatedTarget;
+          var subjectid = button.getAttribute("data-subjectid");
+
+          var deletesubjectid = document.getElementById("deletesubjectid");
+          deletesubjectid.value = subjectid;
+        });
+      });
+
+      function deleteSubject() {
+        document.getElementById("deletesubjectForm").submit();
+      }
+    </script>
+
+    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="assets/vendor/echarts/echarts.min.js"></script>
+    <script src="assets/vendor/quill/quill.js"></script>
+    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>

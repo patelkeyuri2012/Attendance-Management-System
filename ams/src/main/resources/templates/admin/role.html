@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html class="loading" lang="en" data-textdirection="ltr"
+	xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<title>Attendance Management System</title>
+<link href="assets/img/favicon.png" rel="icon">
+<link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+	integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+	crossorigin="anonymous">
+<link href="https://fonts.gstatic.com" rel="preconnect">
+<link
+	href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+	rel="stylesheet">
+<link href="assets/vendor/bootstrap/css/bootstrap.min.css"
+	rel="stylesheet">
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.css"
+	rel="stylesheet">
+<link href="assets/vendor/boxicons/css/boxicons.min.css"
+	rel="stylesheet">
+<link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
+<link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+<link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+<link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+<link href="assets/css/style.css" rel="stylesheet">
+<script>
+	function preventBack() {
+		window.history.forward();
+	}
+	setTimeout("preventBack()", 0);
+	window.onunload = function() {
+		null
+	};
+</script>
+</head>
+
+<body>
+	<div th:replace="~{admin/nav :: body}"></div>
+	<main id="main" class="main">
+		<div class="pagetitle">
+			<h1>Role</h1>
+			<nav>
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="index.html">Home</a></li>
+					<li class="breadcrumb-item active">Role</li>
+				</ol>
+			</nav>
+		</div>
+		<section class="role section">
+			<div class="col-lg-12">
+				<div class="card">
+					<div class="card-body">
+						<div class=" d-flex justify-content-between align-items-center">
+							<table class="table-custom">
+								<thead>
+									<tr>
+										<th scope="col">User</th>
+										<th scope="col">Role</th>
+										<th scope="col" style="text-align: right; width: 100px;"></th>
+									</tr>
+								</thead>
+								<tbody>
+								<tbody>
+									<tr th:each="userRole : ${userRoles}">
+										<td th:text="${userRole.user.username}"
+											th:attr="data-userid=${userRole.user.userid}"></td>
+										<td th:text="${userRole.role.name}"
+											th:attr="data-roleid=${userRole.role.roleid}"></td>
+										<td><i class="fas fa-edit" data-bs-toggle="modal"
+											th:data-userRoleid="${userRole.userroleid}"
+											data-bs-target="#edituserRoleModal"></i> <i class="fas"
+											th:classappend="${userRole.user.blocked} ? 'fa-check-circle' : 'fa-times-circle'"
+											data-bs-toggle="modal"
+											th:data-userRoleid="${userRole.userroleid}"
+											th:attr="data-bs-target=${userRole.user.blocked} ? '#unblockuserRoleModal' : '#blockuserRoleModal'"></i>
+										</td>
+									</tr>
+								</tbody>
+
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<div class="modal fade" id="edituserRoleModal" tabindex="-1">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Edit Role</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<i class="fa fa-times"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="form-container">
+						<form id="editUserRoleForm" th:action="@{/editUserRoles}"
+							method="post" onsubmit="return validateForm()">
+							<input type="hidden" id="userroleid" name="userroleid">
+							<div class="form-group">
+								<label for="user" class="col-md-12 mb-3"><i
+									class="fas fa-user"></i> User</label> <select id="user" name="userid">
+									<option value="">Select User</option>
+									<option th:each="user : ${users}" th:value="${user.userid}"
+										th:text="${user.username}"></option>
+								</select>
+								<p id="userError" class="error-message"></p>
+							</div>
+							<div class="form-group">
+								<label for="role" class="col-md-12 mb-3"><i
+									class="fas fa-door-open"></i> Role</label> <select id="role"
+									name="roleid">
+									<option value="">Select Role</option>
+									<option th:each="role : ${roles}" th:value="${role.roleid}"
+										th:text="${role.name}"></option>
+								</select>
+								<p id="roleError" class="error-message"></p>
+							</div>
+							<div class="form-group mt-3">
+								<button type="submit" class="btn-submit">Edit Role</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="blockuserRoleModal" tabindex="-1">
+		<div class="modal-dialog modal-confirm">
+			<div class="modal-content">
+				<div class="modal-header flex-column">
+					<h4>Are you sure?</h4>
+				</div>
+				<div class="modal-body">
+					<p>Do you really want to block this user?</p>
+				</div>
+				<div class="modal-footer justify-content-center">
+					<form id="blockuserForm" th:action="@{/blockUser}" method="post">
+						<input type="hidden" id="blockuserroleid" name="userroleid">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+						<button type="button" class="btn btn-danger" onclick="blockUser()">Block</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="modal fade" id="unblockuserRoleModal" tabindex="-1">
+		<div class="modal-dialog modal-confirm">
+			<div class="modal-content">
+				<div class="modal-header flex-column">
+					<h4>Are you sure?</h4>
+				</div>
+				<div class="modal-body">
+					<p>Do you really want to unblock this user?</p>
+				</div>
+				<div class="modal-footer justify-content-center">
+					<form id="unblockuserForm" th:action="@{/unblockUser}"
+						method="post">
+						<input type="hidden" id="unblockuserroleid" name="userroleid">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+						<button type="button" class="btn btn-success"
+							onclick="unblockUser()">Unblock</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<script>
+		function validateForm() {
+			let isValid = true;
+			const userDropdown = document.getElementById('user');
+			const userError = document.getElementById('userError');
+			if (userDropdown.value === "") {
+				userError.textContent = 'Please select a user';
+				isValid = false;
+			} else {
+				userError.textContent = '';
+			}
+			const roleDropdown = document.getElementById('role');
+			const roleError = document.getElementById('roleError');
+			if (roleDropdown.value === "") {
+				roleError.textContent = 'Please select a role';
+				isValid = false;
+			} else {
+				roleError.textContent = '';
+			}
+			return isValid;
+		}
+	</script>
+
+	<script>
+	document.addEventListener('DOMContentLoaded', function () {
+	    var blockModal = document.getElementById('blockuserRoleModal');
+	    var unblockModal = document.getElementById('unblockuserRoleModal');
+	    var edituserRoleModal = document.getElementById('edituserRoleModal');
+
+	    blockModal.addEventListener('show.bs.modal', function (event) {
+	        var button = event.relatedTarget;
+	        var userRoleId = button.getAttribute('data-userRoleid');
+	        document.getElementById('blockuserroleid').value = userRoleId;
+	    });
+
+	    unblockModal.addEventListener('show.bs.modal', function (event) {
+	        var button = event.relatedTarget;
+	        var userRoleId = button.getAttribute('data-userRoleid');
+	        document.getElementById('unblockuserroleid').value = userRoleId;
+	    });
+
+	    edituserRoleModal.addEventListener('show.bs.modal', function (event) {
+	        var button = event.relatedTarget;
+	        var userRoleId = button.getAttribute('data-userRoleid');
+	        var row = button.closest('tr');
+	        var userValue = row.querySelector('td:nth-child(1)').getAttribute('data-userid');
+	        var roleValue = row.querySelector('td:nth-child(2)').getAttribute('data-roleid');
+
+	        document.getElementById('user').value = userValue;
+	        document.getElementById('role').value = roleValue;
+	        document.getElementById('userroleid').value = userRoleId;
+	    });
+
+	    document.getElementById('userRoleForm').addEventListener('submit', function (event) {
+	        if (!validateForm()) {
+	            event.preventDefault();
+	        }
+	    });
+
+	    document.getElementById('blockuserForm').addEventListener('submit', function (event) {
+	        blockUser();
+	    });
+
+	    document.getElementById('unblockuserForm').addEventListener('submit', function (event) {
+	        unblockUser();
+	    });
+	});
+
+	function blockUser() {
+	    document.getElementById('blockuserForm').submit();
+	}
+
+	function unblockUser() {
+	    document.getElementById('unblockuserForm').submit();
+	}
+	</script>
+
+	<script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+	<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="assets/vendor/chart.js/chart.umd.js"></script>
+	<script src="assets/vendor/echarts/echarts.min.js"></script>
+	<script src="assets/vendor/quill/quill.js"></script>
+	<script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+	<script src="assets/vendor/tinymce/tinymce.min.js"></script>
+	<script src="assets/vendor/php-email-form/validate.js"></script>
+	<script src="assets/js/main.js"></script>
+</body>
+
+</html>

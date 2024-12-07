@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html
+  class="loading"
+  lang="en"
+  data-textdirection="ltr"
+  xmlns:th="http://www.thymeleaf.org"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Attendance Management System</title>
+    <link href="assets/img/favicon.png" rel="icon" />
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+
+    <link href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+      rel="stylesheet"
+    />
+
+    <link
+      href="assets/vendor/bootstrap/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="assets/vendor/bootstrap-icons/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet" />
+    <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet" />
+    <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet" />
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet" />
+    <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css"
+      rel="stylesheet"
+    />
+
+    <link href="assets/css/style.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <div th:replace="~{teacher/nav :: body}"></div>
+    <main id="main" class="main">
+      <div class="pagetitle">
+        <h1>Student</h1>
+        <nav>
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+            <li class="breadcrumb-item active">Student</li>
+          </ol>
+        </nav>
+      </div>
+
+      <section class="section class">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="row">
+              <div class="col-lg-8">
+                <div class="class-card" id="analysis" style="display: block">
+                  <div class="class-card-body">
+                    <div
+                      class="d-flex justify-content-between align-items-center"
+                    >
+                      <canvas
+                        id="studentChart"
+                        width="400"
+                        height="400"
+                      ></canvas>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="class-card" id="studentList" style="display: none">
+                  <div class="class-card-body">
+                    <div
+                      class="d-flex justify-content-between align-items-center"
+                    >
+                      <h5 class="card-std">Student List</h5>
+                      <button
+                        type="button"
+                        class="btn-close"
+                        aria-label="Close"
+                        onclick="document.getElementById('studentList').style.display = 'none'; document.getElementById('analysis').style.display = 'block';"
+                      >
+                        <i class="fa fa-times"></i>
+                      </button>
+                    </div>
+                    <table class="table-custom">
+                      <thead>
+                        <tr>
+                          <th scope="col">Enrollment No</th>
+                          <th scope="col">Student Name</th>
+                          <th scope="col">Semester</th>
+                          <th scope="col">Active</th>
+                          <th scope="col"></th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="col-lg-12">
+                  <div th:each="entry : ${programSemesterStudentMap}">
+                    <div class="class-card">
+                      <div class="class-card-body">
+                        <div
+                          class="d-flex justify-content-between align-items-center mb-3"
+                        >
+                          <h5
+                            class="class-title"
+                            th:text="${entry.key.program}"
+                          ></h5>
+                          <a
+                            href="#"
+                            class="student-link"
+                            th:data-program-id="${entry.key.programid}"
+                          >
+                            <i class="fas fa-external-link-alt"></i>
+                          </a>
+                        </div>
+                        <div class="row mb-2">
+                          <div
+                            th:each="semesterDetail : ${entry.value}"
+                            class="row mb-2"
+                            th:if="${semesterDetail.studentCount > 0}"
+                            style="font-size: 14px"
+                          >
+                            <div class="col-4" style="font-size: 16px">
+                              SEM:
+                              <span
+                                th:text="${semesterDetail['semester'].semesterid}"
+                              ></span>
+                            </div>
+                            <div
+                              class="col-8 d-flex align-items-center"
+                              style="font-size: 16px"
+                            >
+                              <div class="mr-2" style="color: #876854">
+                                No. of Students:
+                              </div>
+                              <div
+                                th:text="${semesterDetail.studentCount}"
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal fade" id="model" tabindex="-1">
+      <div class="modal-dialog modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Student Details</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-xl-4">
+                <div class="profile-card">
+                  <img
+                    src="assets/img/profile-img.png"
+                    alt="Profile"
+                    class="profile-img"
+                    id="profile"
+                  />
+                  <h2 id="studentName"></h2>
+                </div>
+              </div>
+
+              <div class="col-xl-8">
+                <div class="row detail-row">
+                  <div class="col-lg-4 col-md-4 label">Enrollment ID</div>
+                  <div class="col-lg-8 col-md-8" id="enrollmentno"></div>
+                </div>
+
+                <div class="row detail-row">
+                  <div class="col-lg-4 col-md-4 label">Full Name</div>
+                  <div class="col-lg-8 col-md-8" id="fullname"></div>
+                </div>
+
+                <div class="row detail-row">
+                  <div class="col-lg-4 col-md-4 label">Program</div>
+                  <div class="col-lg-8 col-md-8" id="program"></div>
+                </div>
+
+                <div class="row detail-row">
+                  <div class="col-lg-4 col-md-4 label">Semester</div>
+                  <div class="col-lg-8 col-md-8" id="semester"></div>
+                </div>
+
+                <div class="row detail-row">
+                  <div class="col-lg-4 col-md-4 label">Date of Birth</div>
+                  <div class="col-lg-8 col-md-8" id="dob"></div>
+                </div>
+
+                <div class="row detail-row">
+                  <div class="col-lg-4 col-md-4 label">Contact Number</div>
+                  <div class="col-lg-8 col-md-8" id="contactno"></div>
+                </div>
+
+                <div class="row detail-row">
+                  <div class="col-lg-4 col-md-4 label">Personal Email</div>
+                  <div class="col-lg-8 col-md-8" id="email"></div>
+                </div>
+
+                <div class="row detail-row">
+                  <div class="col-lg-4 col-md-4 label">GVP Email</div>
+                  <div class="col-lg-8 col-md-8" id="gvpemail"></div>
+                </div>
+
+                <div class="row detail-row">
+                  <div class="col-lg-4 col-md-4 label">Address</div>
+                  <div class="col-lg-8 col-md-8" id="address"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.querySelectorAll(".student-link").forEach((link) => {
+        link.addEventListener("click", function () {
+          const programId = this.getAttribute("data-program-id");
+          showStudentList(programId);
+        });
+      });
+
+      function showStudentList(programId) {
+        document.getElementById("analysis").style.display = "none";
+        document.getElementById("studentList").style.display = "block";
+
+        fetch(`/api/getStudentsByProgram?programId=${programId}`)
+          .then((response) => response.json())
+          .then((data) => {
+            const studentListBody =
+              document.querySelector("#studentList tbody");
+            studentListBody.innerHTML = "";
+            data.forEach((student) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+	                    <td>${student.entrollmentno}</td>
+	                    <td>${student.fname} ${student.mname || ""} ${
+                student.lname
+              }</td>
+	                    <td>${student.semester}</td>
+	                    <td>
+	                    ${
+                        student.active
+                          ? '<span class="badge badge-success">YES</span>'
+                          : '<span class="badge badge-danger">NO</span>'
+                      }
+	                </td>
+	                    <td>
+	                    <i class="fa fa-archive" 
+	                       data-bs-toggle="modal" 
+	                       data-bs-target="#model"
+	                       data-enrollmentno="${student.entrollmentno}"
+	                       data-name="${student.fname} ${student.lname}"
+	                       data-fullname="${student.fname} ${student.mname || ""} ${
+                student.lname
+              }"
+	                       data-program="${student.program}"
+	                       data-semester="${student.semester}"
+	                       data-dob="${student.dob}"
+	                       data-contactno="${student.contactnumber}"
+	                       data-email="${student.email}"
+	                       data-gvpemail="${student.gvpemail}"
+	                       data-address="${student.address}"
+	                       data-profileimg="${student.image}">
+	                    </i>
+	                </td>
+	                `;
+              studentListBody.appendChild(row);
+            });
+          })
+          .catch((error) =>
+            console.error("Error fetching student list:", error)
+          );
+      }
+
+      const modal = document.getElementById("model");
+      modal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget;
+
+        const enrollmentno = button.getAttribute("data-enrollmentno");
+        const name = button.getAttribute("data-name");
+        const fullname = button.getAttribute("data-fullname");
+        const program = button.getAttribute("data-program");
+        const semester = button.getAttribute("data-semester");
+        const contactno = button.getAttribute("data-contactno");
+        const email = button.getAttribute("data-email");
+        const gvpemail = button.getAttribute("data-gvpemail");
+        const address = button.getAttribute("data-address");
+        const profileImage = button.getAttribute("data-profileimg");
+
+        const dobTimestamp = button.getAttribute("data-dob");
+
+        const dob = new Date(parseInt(dobTimestamp));
+
+        const formattedDOB = dob.toLocaleDateString("en-GB");
+
+        modal.querySelector("#enrollmentno").textContent = enrollmentno;
+        modal.querySelector("#studentName").textContent = name;
+        modal.querySelector("#fullname").textContent = fullname;
+        modal.querySelector("#program").textContent = program;
+        modal.querySelector("#semester").textContent = semester;
+        modal.querySelector("#dob").textContent = formattedDOB;
+        modal.querySelector("#contactno").textContent = contactno;
+        modal.querySelector("#email").textContent = email;
+        modal.querySelector("#gvpemail").textContent = gvpemail;
+        modal.querySelector("#address").textContent = address;
+        modal.querySelector("#profile").setAttribute("src", profileImage);
+      });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      var programData = /*[[${simplifiedProgramSemesterStudentMap}]]*/ {};
+
+      var labels = [];
+      var activeStudentsData = [];
+      var deactiveStudentsData = [];
+      var actualActiveCounts = [];
+      var actualDeactiveCounts = [];
+      var maxStudentCount = 0;
+
+      // Populate chart data and determine max student count for dynamic y-axis scaling
+      if (programData && Object.keys(programData).length > 0) {
+        Object.keys(programData).forEach(function (programName) {
+          var semesterDetailsList = programData[programName];
+
+          semesterDetailsList.forEach(function (semesterDetail) {
+           
+
+            if (
+              (semesterDetail.activeCount > 0 ||
+                semesterDetail.deactiveCount > 0) &&
+              semesterDetail.semester
+            ) {
+              var semesterLabel = `${programName} - ${
+                semesterDetail.semester.semester || "Unknown"
+              }`;
+              labels.push(semesterLabel);
+
+              var totalStudents = semesterDetail.studentCount;
+              maxStudentCount = Math.max(maxStudentCount, totalStudents);
+
+              var activePercentage =
+                (semesterDetail.activeCount / totalStudents) * 100;
+              var deactivePercentage =
+                (semesterDetail.deactiveCount / totalStudents) * 100;
+
+              activeStudentsData.push(activePercentage);
+              deactiveStudentsData.push(deactivePercentage);
+
+              actualActiveCounts.push(semesterDetail.activeCount);
+              actualDeactiveCounts.push(semesterDetail.deactiveCount);
+            }
+          });
+        });
+      } else {
+        console.error("Expected an object, but got:", programData);
+      }
+
+      // Adjust y-axis maximum dynamically based on the max student count percentage
+      const yAxisMax = maxStudentCount > 0 ? 100 : 0;
+
+      const ctx = document.getElementById("studentChart").getContext("2d");
+      const studentChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "Active Students",
+              data: activeStudentsData,
+              backgroundColor: "rgba(135, 104, 84, 0.5)",
+              borderColor: "rgba(135, 104, 84, 0.7)",
+              borderWidth: 1,
+              stack: "Stack 0",
+            },
+            {
+              label: "Deactive Students",
+              data: deactiveStudentsData,
+              backgroundColor: "rgba(135, 104, 84, 0.6)",
+              borderColor: "rgba(135, 104, 84, 0.7)",
+              borderWidth: 1,
+              stack: "Stack 0",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: {
+              stacked: true,
+            },
+            y: {
+              stacked: true,
+              beginAtZero: true,
+              max: yAxisMax,
+              ticks: {
+                callback: function (value) {
+                  return value + "%";
+                },
+                stepSize: 10,
+              },
+            },
+          },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  var index = context.dataIndex;
+                  if (context.dataset.label === "Active Students") {
+                    return `Active Students: ${
+                      actualActiveCounts[index]
+                    } (${context.raw.toFixed(1)}%)`;
+                  } else if (context.dataset.label === "Deactive Students") {
+                    return `Deactive Students: ${
+                      actualDeactiveCounts[index]
+                    } (${context.raw.toFixed(1)}%)`;
+                  }
+                },
+              },
+            },
+          },
+        },
+      });
+
+      studentChart.update();
+      /*]]>*/
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="assets/vendor/echarts/echarts.min.js"></script>
+    <script src="assets/vendor/quill/quill.js"></script>
+    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>

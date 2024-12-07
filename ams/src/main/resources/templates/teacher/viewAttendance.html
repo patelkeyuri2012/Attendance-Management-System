@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+
+<html class="loading" lang="en" data-textdirection="ltr"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<title>Attendance Management System</title>
+<link href="assets/img/favicon.png" rel="icon" />
+<link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
+
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+	integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+	crossorigin="anonymous" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<link href="https://fonts.gstatic.com" rel="preconnect" />
+<link
+	href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+	rel="stylesheet" />
+
+<link href="assets/vendor/bootstrap/css/bootstrap.min.css"
+	rel="stylesheet" />
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.css"
+	rel="stylesheet" />
+<link href="assets/vendor/boxicons/css/boxicons.min.css"
+	rel="stylesheet" />
+<link href="assets/vendor/quill/quill.snow.css" rel="stylesheet" />
+<link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet" />
+<link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet" />
+<link href="assets/vendor/simple-datatables/style.css" rel="stylesheet" />
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css"
+	rel="stylesheet" />
+
+<link href="assets/css/style.css" rel="stylesheet" />
+</head>
+
+<body>
+	<div th:replace="~{teacher/nav :: body}"></div>
+
+	<main id="main" class="main">
+		<div class="pagetitle">
+			<h1>View Attendance</h1>
+			<nav>
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="index.html">Home</a></li>
+					<li class="breadcrumb-item active">View Attendance</li>
+				</ol>
+			</nav>
+		</div>
+
+		<section class="section takeAttendance">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="card">
+						<div class="card-body">
+							<div class="row">
+								<div class="col-3">
+									<div class="activity">
+										<div class="row align-items-center">
+											<label for="startAttendanceDate" class="form-label"
+												style="font-size: 16px;"> <i
+												class="far fa-calendar-alt"
+												style="font-size: 20px; color: #876854; margin-right: 5px;"></i>
+												Start Date
+											</label> <input type="date" class="form-control"
+												id="startAttendanceDate" name="startAttendanceDate"
+												onblur="validateStartDate()" onchange="fetchAttendance()"/>
+										</div>
+										<p id="startDateError" class="error-message"></p>
+										<div class="row align-items-center" style="margin-top: 25px;">
+											<label for="endAttendanceDate" class="form-label"
+												style="font-size: 16px;"> <i
+												class="far fa-calendar-alt"
+												style="font-size: 20px; color: #876854; margin-right: 5px;"></i>
+												End Date
+											</label> <input type="date" class="form-control"
+												id="endAttendanceDate" name="endAttendanceDate"
+												onblur="validateEndDate()" onchange="fetchAttendance()"/>
+										</div>
+										<p id="endDateError" class="error-message"></p>
+
+									</div>
+								</div>
+
+								<div class="col-9">
+									<div class="activity" id="attendance-container"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-12" id="attendanceTableContainer"
+				style="display: none">
+				<div class="card">
+					<div class="card-body">
+						<form class="row mb-3" id="attendanceForm"
+							th:action="@{/updateTeacherAttendance}" method="post">
+							<input type="hidden" id="attendanceid" name="attendanceid"
+								th:value="${attendance?.attendancemasterid?.attendancemasterid ?: ''}">
+							<div class="col-4">
+								<label for="program" class="col-md-12 mb-3"><i
+									class="fas fa-graduation-cap"></i> Program</label> <select
+									class="form-select" id="program" name="program"
+									onchange="loadSemesters(loadSubjects)" disabled>
+									<option value="">Select Program</option>
+									<option th:each="program : ${programs}"
+										th:if="${program.active}" th:value="${program.programid}"
+										th:text="${program.program}"></option>
+								</select> <input type="hidden" id="programid" name="programid" />
+								<p id="programError" class="error-message"></p>
+							</div>
+
+							<div class="col-4">
+								<label for="semester" class="col-md-12 mb-3"><i
+									class="fa fa-book"></i> Semester</label> <select class="form-select"
+									id="semester" name="semester" onchange="loadSubjects()"
+									disabled>
+									<option value="">Select Program first</option>
+								</select> <input type="hidden" id="semesterid" name="semesterid" />
+								<p id="semesterError" class="error-message"></p>
+							</div>
+
+							<div class="col-4">
+								<label for="subject" class="col-md-12 mb-3"><i
+									class="fas fa-book-open"></i> Subject</label> <select
+									class="form-select" id="subject" name="subject" disabled>
+									<option value="">Select Semester first</option>
+								</select> <input type="hidden" id="subjectid" name="subjectid" />
+								<p id="subjectError" class="error-message"></p>
+							</div>
+
+							<div class="col-md-4">
+								<label for="lectureDate" class="form-label"><i
+									class="far fa-calendar-alt"></i> Lecture Date</label> <input
+									type="date" class="form-control" id="lectureDate"
+									name="lectureDate" readonly />
+							</div>
+
+							<div class="col-md-4">
+								<label for="startTime" class="form-label"><i
+									class="fas fa-hourglass-start"></i> Start Time</label> <input
+									type="time" class="form-control" id="startTime"
+									name="startTime" readonly />
+							</div>
+
+							<div class="col-md-4">
+								<label for="endTime" class="form-label"><i
+									class="fas fa-hourglass-end"></i> End Time</label> <input type="time"
+									class="form-control" id="endTime" name="endTime" readonly />
+							</div>
+
+							<div class="col-12">
+								<div class="col-md-12">
+									<div class="custom-radio">
+										<input type="radio" id="present" value="present"
+											name="attendanceStatus" checked /> <label for="present"
+											class="radio-icon"></label> <span class="radio-text">Present</span>
+
+										<input type="radio" id="absent" value="absent"
+											name="attendanceStatus" /> <label for="absent"
+											class="radio-icon"></label> <span class="radio-text">Absent</span>
+									</div>
+								</div>
+
+
+								<input type="hidden" name="attendanceBy" id="attendanceBy"
+									th:value="${userDetails.teacherid}" />
+
+								<table class="table-custom">
+									<thead>
+										<tr>
+											<th scope="col"></th>
+											<th scope="col">Enrollment No</th>
+											<th scope="col">Name</th>
+										</tr>
+									</thead>
+									<tbody id="studentList"></tbody>
+								</table>
+							</div>
+							<div class="col-12 text-end" id="submitButtonContainer"
+								style="display: none">
+								<button type="submit" class="btn btn-custom"
+									id="submitAttendance" style="width: 150px">Save
+									Attendance</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+
+	<script>
+	function validateStartDate() {
+	    const startDate = document.getElementById("startAttendanceDate").value;
+	    const endDate = document.getElementById("endAttendanceDate").value;
+	    const errorElement = document.getElementById("startDateError");
+
+	    errorElement.textContent = "";  // Clear any previous error messages
+
+	    const tomorrow = new Date();
+	    tomorrow.setDate(tomorrow.getDate() + 1);
+	    const tomorrowString = tomorrow.toISOString().split("T")[0]; // Get tomorrow's date in YYYY-MM-DD format
+
+	    if (startDate === tomorrowString) {
+	        errorElement.textContent = "Please select a valid start date ";
+	        return false;
+	    }
+
+	    if (startDate && endDate) {
+	        const startDateObj = new Date(startDate);
+	        const endDateObj = new Date(endDate);
+
+	        if (startDateObj > endDateObj) {
+	            errorElement.textContent = "Attendance start date must be before the attendance end date.";
+	            return false;
+	        }
+
+	        if (startDate === endDate) {
+	            errorElement.textContent = "Attendance start date cannot be the same as the attendance end date.";
+	            return false;
+	        }
+	    }
+
+	    return true;
+	}
+
+	function validateEndDate() {
+	    const startDate = document.getElementById("startAttendanceDate").value;
+	    const endDate = document.getElementById("endAttendanceDate").value;
+	    const errorElement = document.getElementById("endDateError");
+
+	    errorElement.textContent = "";  
+
+	    const tomorrow = new Date();
+	    tomorrow.setDate(tomorrow.getDate() + 1);
+	    const tomorrowString = tomorrow.toISOString().split("T")[0];
+
+	    if (endDate === tomorrowString) {
+	        errorElement.textContent = "Please select a valid end date";
+	        return false;
+	    }
+
+	    if (startDate && endDate) {
+	        const startDateObj = new Date(startDate);
+	        const endDateObj = new Date(endDate);
+
+	        if (endDateObj < startDateObj) {
+	            errorElement.textContent = "Attendance end date must be after the attendance start date.";
+	            return false;
+	        }
+	    }
+
+	    return true;
+	}
+
+	function validateForm() {
+	    const isStartDateValid = validateStartDate();
+	    const isEndDateValid = validateEndDate();
+
+	    return isStartDateValid && isEndDateValid;
+	}
+
+	document.getElementById("startAttendanceDate").addEventListener("blur", validateStartDate);
+	document.getElementById("endAttendanceDate").addEventListener("blur", validateEndDate);
+</script>
+	
+	<script>	
+
+    const startAttendanceDateInput = document.getElementById('startAttendanceDate');
+
+    const endAttendanceDateInput = document.getElementById('endAttendanceDate');
+
+    
+    startAttendanceDateInput.addEventListener('focus', function() {
+    	startAttendanceDateInput.style.borderColor = '#876854';
+    	startAttendanceDateInput.style.boxShadow = 'none';
+    });
+
+    startAttendanceDateInput.addEventListener('blur', function() {
+    	startAttendanceDateInput.style.borderColor = '#876854';
+    	startAttendanceDateInput.style.boxShadow = 'none';
+    });
+    
+    endAttendanceDateInput.addEventListener('focus', function() {
+    	endAttendanceDateInput.style.borderColor = '#876854';
+    	endAttendanceDateInput.style.boxShadow = 'none';
+    });
+
+    endAttendanceDateInput.addEventListener('blur', function() {
+    	endAttendanceDateInput.style.borderColor = '#876854';
+    	endAttendanceDateInput.style.boxShadow = 'none';
+    });
+</script>
+
+
+	<script>
+	function loadSemesters(semesterId, callback) {
+	    var programId = $("#program").val();
+	    if (programId) {
+	        $.ajax({
+	            type: "GET",
+	            url: "/api/activesemester",
+	            data: { programId: programId },
+	            success: function (data) {
+	                var semesterSelect = $("#semester");
+	                semesterSelect.empty();
+	                semesterSelect.append('<option value="">Select Semester</option>');
+
+	                $.each(data, function (index, semester) {
+	                    semesterSelect.append(
+	                        '<option value="' + semester.semesterid + '">' + semester.semester + '</option>'
+	                    );
+	                });
+
+	                if (semesterId) {
+	                    semesterSelect.val(semesterId); 
+	                }
+
+	                if (callback) callback();
+	            },
+	            error: function () {
+	                alert("Error loading semesters");
+	            }
+	        });
+	    }
+	}
+
+	function loadSubjects(subjectId, callback) {
+	    var programId = $("#program").val(); 
+	    var semesterId = $("#semester").val();
+
+	    if (programId && semesterId) {
+	        $.ajax({
+	            type: "GET",
+	            url: `/api/subjects/${programId}/${semesterId}`,  
+	            success: function (data) {
+	                var subjectSelect = $("#subject");
+	                subjectSelect.empty();
+	                subjectSelect.append('<option value="">Select Subject</option>');
+
+	                $.each(data, function (index, subject) {
+	                    subjectSelect.append(
+	                        '<option value="' + subject.subjectid + '">' + subject.name + '</option>'
+	                    );
+	                });
+
+	                if (subjectId) {
+	                    subjectSelect.val(subjectId);
+	                }
+
+	                if (callback) callback(); 
+	            },
+	            error: function () {
+	                alert("Error loading subjects");
+	            }
+	        });
+	    } 
+	}
+	
+</script>
+
+	<script>
+    function fetchAttendance() {
+        const startDate = document.getElementById('startAttendanceDate').value;
+        const endDate = document.getElementById('endAttendanceDate').value;
+        if (!startDate || !endDate) return;
+
+        fetch(`/api/getAttendance?startDate=${startDate}&endDate=${endDate}`)
+        .then(response => response.json())
+       
+            .then(data => {
+                const container = document.getElementById('attendance-container');
+                container.innerHTML = '';
+
+                if (data.length === 0) {
+                    container.innerHTML = '<p>No attendance data found for the selected date.</p>';
+                } else {
+                	data.forEach(attendance => {
+                	    const activityItem = `
+                	    	<div class="activity-item d-flex mb-3"
+                	         data-attendanceid="${attendance.attendancemasterid}"
+                	         data-programid="${attendance.programid}"
+                	         data-semesterid="${attendance.semesterid}"
+                	         data-subjectid="${attendance.subjectid}"
+                	         data-program="${attendance.program}"
+                	         data-semester="${attendance.semester}"
+                	         data-subject="${attendance.subject}"
+                	         data-lecture-date="${attendance.date}"
+                	         data-start-time="${attendance.startTime || 'N/A'}"
+                	         data-end-time="${attendance.endTime || 'N/A'}"
+                	         style="cursor: pointer">
+                	         <div class="activite-line"></div>
+ 								<i class="bi bi-circle-fill activity-badge align-self-start"></i>
+                 	    	
+                	            <div class="activity-content">
+                	                ${attendance.subjectCode} ${attendance.subject}
+                	            </div>
+                	            <div class="activite-p" style="width: 100px; text-align: left">
+                	                ${attendance.program} ${attendance.semester}
+                	            </div>
+                	            <div class="activite-p" style="width: 125px; text-align: center">
+                	                ${attendance.date}
+                	            </div>
+                	            <div class="activite-p" style="width: 150px; text-align: right">
+                	                ${attendance.startTime || 'N/A'} to ${attendance.endTime || 'N/A'}
+                	            </div>
+                	        </div>`;
+                	    container.innerHTML += activityItem;
+                	});
+
+                }
+            })
+            .catch(error => console.error('Error fetching attendance:', error));
+    }
+</script>
+
+
+	<script>
+	   document.addEventListener('DOMContentLoaded', function () {
+           const attendanceContainer = document.getElementById('attendance-container');
+           const attendanceInput = document.getElementById('attendanceid');
+           const programSelect = document.getElementById('program');
+           const semesterSelect = document.getElementById('semester');
+           const subjectSelect = document.getElementById('subject');
+           const lectureDate = document.getElementById('lectureDate');
+           const startTime = document.getElementById('startTime');
+           const endTime = document.getElementById('endTime');
+           const attendanceTableContainer = document.getElementById('attendanceTableContainer');
+           const submitButtonContainer = document.getElementById('submitButtonContainer');
+
+           if (attendanceContainer) {
+               attendanceContainer.addEventListener('click', function (e) {
+                   if (e.target.closest('.activity-item')) {
+                       const item = e.target.closest('.activity-item');
+
+                       const attendanceId = item.getAttribute('data-attendanceid');
+                       const programId = item.getAttribute('data-programid');
+                       const semesterId = item.getAttribute('data-semesterid');
+                       const subjectId = item.getAttribute('data-subjectid');
+                       const lectureDateValue = item.getAttribute('data-lecture-date');
+                       const startTimeValue = item.getAttribute('data-start-time');
+                       const endTimeValue = item.getAttribute('data-end-time');
+                       
+                       attendanceInput.value = attendanceId;
+                       programSelect.value = programId || '';
+                       $(programSelect).trigger('change'); 
+
+                       loadSemesters(semesterId, function () {
+                           semesterSelect.value = semesterId || '';
+                           $(semesterSelect).trigger('change'); 
+
+                           loadSubjects(subjectId, function () {
+                               subjectSelect.value = subjectId || '';
+                               $(subjectSelect).trigger('change');
+                               fetchStudentData(subjectId, attendanceId);
+                               showAttendanceForm();
+                           });
+                       });
+
+                       lectureDate.value = lectureDateValue ? convertDateFormat(lectureDateValue) : '';
+                       startTime.value = startTimeValue ? convertTo24HourFormat(startTimeValue) : '';
+                       endTime.value = endTimeValue ? convertTo24HourFormat(endTimeValue) : '';
+
+                   }
+               });
+           }
+
+           function convertDateFormat(date) {
+               const [day, month, year] = date.split('-');
+               return `${year}-${month}-${day}`;
+           }
+
+           function convertTo24HourFormat(time) {
+               const [hour, minute, modifier] = time.match(/(\d+):(\d+)\s?(AM|PM)/i).slice(1);
+               let hours24 = parseInt(hour, 10);
+               if (modifier.toUpperCase() === 'PM' && hours24 < 12) hours24 += 12;
+               if (modifier.toUpperCase() === 'AM' && hours24 === 12) hours24 = 0;
+               return `${hours24.toString().padStart(2, '0')}:${minute}`;
+           }
+
+           function showAttendanceForm() {
+               if (
+                   programSelect.value &&
+                   semesterSelect.value &&
+                   subjectSelect.value &&
+                   lectureDate.value &&
+                   startTime.value &&
+                   endTime.value
+               ) {
+                   attendanceTableContainer.style.display = 'block';
+                   submitButtonContainer.style.display = 'block';
+               } else {
+                   attendanceTableContainer.style.display = 'none';
+                   submitButtonContainer.style.display = 'none';
+               }
+           }
+           async function fetchStudentData(subjectId, attendanceId) {
+        	    try {
+        	
+        	        const response = await fetch(`/api/getStudentsAttendance?subjectId=${subjectId}&attendanceMasterId=${attendanceId}`);
+
+        	        if (!response.ok) throw new Error('Network response was not ok');
+
+        	        const students = await response.json();
+
+
+        	        if (!students || !Array.isArray(students)) {
+        	            console.error('Invalid student data received.');
+        	            return;
+        	        }
+
+        	        const studentList = document.getElementById('studentList');
+        	        studentList.innerHTML = '';  // Clear the student list initially
+
+        	        function updateCheckboxes() {
+        	            const selectedStatus = document.querySelector('input[name="attendanceStatus"]:checked').value;
+        	       
+
+        	            studentList.innerHTML = '';  // Clear the existing list of students
+
+        	            students.forEach(student => {
+        	                const row = document.createElement('tr');
+
+        	                const checkboxCell = document.createElement('td');
+        	                const checkboxDiv = document.createElement('div');
+        	                checkboxDiv.className = 'custom-checkbox';
+        	                checkboxDiv.style.marginTop = '0px';
+
+        	                const checkbox = document.createElement('input');
+        	                checkbox.type = 'checkbox';
+        	                checkbox.id = student.studentid;
+        	                checkbox.value = student.studentid;
+        	                checkbox.name = 'studentIds[]';
+
+        	                const label = document.createElement('label');
+        	                label.setAttribute('for', student.studentid);
+        	                label.className = 'checkbox-icon';
+
+        	                if (selectedStatus === 'present') {
+        	                    checkbox.checked = student.attendancestatus === 1;
+        	                } else if (selectedStatus === 'absent') {
+        	                    checkbox.checked = student.attendancestatus === 2;
+        	                }
+
+        	                checkboxDiv.appendChild(checkbox);
+        	                checkboxDiv.appendChild(label);
+        	                checkboxCell.appendChild(checkboxDiv);
+
+        	                const enrollmentCell = document.createElement('td');
+        	                enrollmentCell.textContent = student.entrollmentno;
+
+        	                const nameCell = document.createElement('td');
+        	                nameCell.textContent = `${student.fname} ${student.mname || ''} ${student.lname}`;
+
+        	                row.appendChild(checkboxCell);
+        	                row.appendChild(enrollmentCell);
+        	                row.appendChild(nameCell);
+
+        	                studentList.appendChild(row);
+
+        	                checkbox.addEventListener('change', function() {
+        	                    printSelectedCheckboxes();
+        	                });
+        	            });
+        	        }
+
+        	        updateCheckboxes();
+
+        	        // Function to print selected checkboxes with their status
+        	        function printSelectedCheckboxes() {
+        	            const selectedCheckboxes = [];
+        	            const checkboxes = document.querySelectorAll('input[name="studentIds[]"]:checked');
+        	            checkboxes.forEach(checkbox => {
+        	                const studentId = checkbox.value;
+        	                const studentStatus = document.querySelector('input[name="attendanceStatus"]:checked').value;
+        	                selectedCheckboxes.push({ studentId, status: studentStatus });
+        	            });
+        	       
+        	        }
+
+        	        const attendanceRadioButtons = document.querySelectorAll('input[name="attendanceStatus"]');
+        	        attendanceRadioButtons.forEach(radio => {
+        	            radio.addEventListener('change', updateCheckboxes);
+        	        });
+
+        	    } catch (error) {
+        	        console.error('Fetch error:', error);
+        	    }
+        	}
+
+
+	           programSelect.addEventListener('change', showAttendanceForm);
+	           semesterSelect.addEventListener('change', showAttendanceForm);
+	           subjectSelect.addEventListener('change', async () => {
+	               showAttendanceForm();
+	               await fetchStudentData(subjectId, attendanceId);
+	           });
+	           lectureDate.addEventListener('change', showAttendanceForm);
+	           startTime.addEventListener('change', showAttendanceForm);
+	           endTime.addEventListener('change', showAttendanceForm);
+       });
+</script>
+
+
+
+	<script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+	<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="assets/vendor/chart.js/chart.umd.js"></script>
+	<script src="assets/vendor/echarts/echarts.min.js"></script>
+	<script src="assets/vendor/quill/quill.js"></script>
+	<script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+	<script src="assets/vendor/tinymce/tinymce.min.js"></script>
+	<script src="assets/vendor/php-email-form/validate.js"></script>
+
+	<script src="assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html class="loading" lang="en" data-textdirection="ltr"
+	xmlns:th="http://www.thymeleaf.org">
+
+
+<head>
+    <meta charset="UTF-8">
+    <title>Attendance Management System</title>
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+        rel="stylesheet">
+
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+    <link href="assets/css/style.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <div th:replace="~{HOD/nav :: body}"></div>
+    <main id="main" class="main">
+
+        <div class="pagetitle">
+            <h1>View Leave</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb-item active">View Leave</li>
+                </ol>
+            </nav>
+        </div>
+
+        <section class="leave section">
+
+            <div class="col-lg-12">
+
+                <div class="card">
+                    <div class="card-body">
+
+                        <div class=" d-flex justify-content-between align-items-center">
+                            <table class="table-custom">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Entrollment No</th>
+                                        <th scope="col">Student</th>
+                                        <th scope="col">Leave Type</th>
+                                        <th scope="col">Start Date</th>
+                                        <th scope="col">End Date</th>
+                                        <th scope="col">No of Leave</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col" style="width: 80px;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+									<tr th:each="leave : ${leaves}">
+										<td><a class="text-muted" data-bs-toggle="modal"
+											th:data-leaveid="${leave.leaveId}"
+											data-bs-target="#studentLeaveModal"
+											th:text="${leave.leaveBy.entrollmentno}"
+											onclick="fetchLeaveDetails(this)"></a></td>
+
+										<td
+											th:text="${leave.leaveBy.fname} + ' ' + ${leave.leaveBy.mname} + ' ' + ${leave.leaveBy.lname}"></td>
+										<td th:text="${leave.leaveType.leaveType}"></td>
+										<td th:text="${#dates.format(leave.startDate, 'yyyy-MM-dd')}"></td>
+										<td th:text="${#dates.format(leave.endDate, 'yyyy-MM-dd')}"></td>
+										<td th:text="${leave.totalLeaveDays}"></td>
+										<td>
+											<p
+												th:classappend="${leave.leaveStatus.leaveStatus == 'Approved' ? 'text-success' :
+                           (leave.leaveStatus.leaveStatus == 'Rejected' ? 'text-danger' : 'text-muted')}"
+												th:text="${leave.leaveStatus.leaveStatus}"></p>
+										</td>
+										<td style="text-align: center;"><i
+											class="fa fa-calendar-check-o text-success"
+											th:data-leaveid="${leave.leaveId}"
+											th:if="${leave.leaveStatus.leaveStatus == 'Pending'}"
+											data-bs-toggle="modal" data-bs-target="#approveLeaveModal"></i>
+
+											<i class="fa fa-calendar-check-o text-muted"
+											th:data-leaveid="${leave.leaveId}"
+											th:unless="${leave.leaveStatus.leaveStatus == 'Pending'}"></i>
+
+
+											<i class="fa fa-calendar-times-o text-danger"
+											th:data-leaveid="${leave.leaveId}"
+											th:if="${leave.leaveStatus.leaveStatus == 'Pending'}"
+											data-bs-toggle="modal" data-bs-target="#rejectLeaveModal"></i>
+
+											<i class="fa fa-calendar-times-o text-muted"
+											th:data-leaveid="${leave.leaveId}"
+											th:unless="${leave.leaveStatus.leaveStatus == 'Pending'}"></i>
+										</td>
+
+									</tr>
+								</tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+   <div class="modal fade" id="studentLeaveModal" tabindex="-1">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content" id="studentLeaveModal">
+				<div class="modal-header">
+					<h5 class="modal-title">Leave Data of Student</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<i class="fa fa-times"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<table class="table-custom">
+						<thead>
+							<tr>
+								<th scope="col">Reason for Leave</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr style="background-color: #fafafa;">
+								<td class="reason-for-leave"></td>
+							</tr>
+						</tbody>
+					</table>
+					<table class="table-custom">
+						<thead>
+							<tr>
+								<th scope="col">Supporting Document</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr style="background-color: #fafafa;">
+								<td><a class="supporting-document" href="#"
+									data-bs-toggle="modal"
+									data-bs-target="#supportingDocumentModal"></a></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<div class="modal fade" id="supportingDocumentModal" tabindex="-1"
+		role="dialog" aria-labelledby="documentModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="supportingDocumentModalLabel">Supporting
+						Document</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close">
+						<i class="fa fa-times"></i>
+					</button>
+				</div>
+				<div class="modal-body" style="overflow: auto;">
+					<iframe src="" style="width: 100%; height: 100vh; border: none;"></iframe>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="approveLeaveModal" tabindex="-1">
+		<div class="modal-dialog modal-confirm">
+			<div class="modal-content">
+				<div class="modal-header flex-column">
+					<h4>Are you sure?</h4>
+				</div>
+				<div class="modal-body">
+					<p>
+						Do you want to approve this leave application?<br> This
+						process cannot be undone.
+					</p>
+				</div>
+				<div class="modal-footer justify-content-center">
+					<form id="approveLeaveForm" th:action="@{/approveStudentLeave}"
+						method="post">
+						<input type="hidden" id="approveLeaveId" name="leaveid">
+						<button type="submit" class="btn btn-secondary"
+							data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+						<button type="submit" class="btn btn-success">Approve</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="rejectLeaveModal" tabindex="-1">
+		<div class="modal-dialog modal-confirm">
+			<div class="modal-content">
+				<div class="modal-header flex-column">
+					<h4>Are you sure?</h4>
+				</div>
+				<div class="modal-body">
+					<p>
+						Do you want to reject this leave application?<br> This
+						process cannot be undone.
+					</p>
+				</div>
+				<div class="modal-footer justify-content-center">
+					<form id="approveLeaveForm" th:action="@{/rejectStudentLeave}"
+						method="post">
+						<input type="hidden" id="rejectLeaveId" name="leaveid">
+						<button type="submit" class="btn btn-secondary"
+							data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+						<button type="submit" class="btn btn-danger">Reject</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+	<script>
+		document.getElementById('supportingDocumentModal').addEventListener(
+				'hidden.bs.modal',
+				function() {
+					var studentLeaveModal = new bootstrap.Modal(document
+							.getElementById('studentLeaveModal'));
+					studentLeaveModal.show();
+				});
+
+		$(document).ready(function() {
+			$('.document-link').click(function(event) {
+				event.preventDefault();
+				var documentUrl = $(this).attr('href');
+				$('#documentModal iframe').attr('src', documentUrl);
+				$('#documentModal').modal('show');
+			});
+		});
+	</script>
+
+
+	<script>
+    document.querySelectorAll('.fa-calendar-check-o').forEach(icon => {
+        icon.addEventListener('click', function() {
+            const leaveId = this.getAttribute('data-leaveid');
+            document.getElementById('approveLeaveId').value = leaveId;
+        });
+    });
+    
+    document.querySelectorAll('.fa-calendar-times-o').forEach(icon => {
+        icon.addEventListener('click', function() {
+            const leaveId = this.getAttribute('data-leaveid');
+            document.getElementById('rejectLeaveId').value = leaveId;
+        });
+    });
+</script>
+
+
+	<script>
+	function fetchLeaveDetails(element) {
+	    const leaveId = element.getAttribute("data-leaveid");
+
+	    fetch(`/api/studentLeave/${leaveId}`)
+	        .then(response => response.json())
+	        .then(data => {
+	       
+	            if (data) {
+	                document.querySelector("#studentLeaveModal .modal-title").textContent = 
+	                    `Leave Data of Student ID ${data.entrollmentno}`;
+	                document.querySelector("#studentLeaveModal .reason-for-leave").textContent = data.reason || "Reason not available";
+
+	             
+	                const supportingDoc = document.querySelector("#studentLeaveModal .supporting-document");
+	                if (data.supportingDocumentPath) {
+	                    supportingDoc.textContent = data.supportingDocumentPath;
+	                    supportingDoc.href = "#"; 
+	                    supportingDoc.setAttribute("data-docpath", data.supportingDocumentPath);
+	                } else {
+	                    supportingDoc.textContent = "No document available";
+	                    supportingDoc.removeAttribute("href");
+	                    supportingDoc.removeAttribute("data-docpath");
+	                }
+	            } else {
+	                console.error("Unexpected data structure:", data);
+	            }
+	        })
+	        .catch(error => console.error('Error fetching leave details:', error));
+	}
+
+</script>
+
+	<script>
+document.querySelector("#studentLeaveModal .supporting-document").addEventListener("click", function(event) {
+    event.preventDefault(); 
+    const docPath = event.target.getAttribute("data-docpath");
+
+    if (docPath) {
+        document.querySelector("#supportingDocumentModal iframe").src = `/${docPath}`;
+        
+        const supportingDocumentModal = new bootstrap.Modal(document.getElementById("supportingDocumentModal"));
+        supportingDocumentModal.show();
+    }
+});
+
+</script>
+
+	<script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+	<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="assets/vendor/chart.js/chart.umd.js"></script>
+	<script src="assets/vendor/echarts/echarts.min.js"></script>
+	<script src="assets/vendor/quill/quill.js"></script>
+	<script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+	<script src="assets/vendor/tinymce/tinymce.min.js"></script>
+	<script src="assets/vendor/php-email-form/validate.js"></script>
+
+	<script src="assets/js/main.js"></script>
+
+</body>
+
+</html></html>

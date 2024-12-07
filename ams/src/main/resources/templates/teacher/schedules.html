@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html class="loading" lang="en" data-textdirection="ltr"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<title>Attendance Management System</title>
+<link href="assets/img/favicon.png" rel="icon" />
+<link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
+
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+	integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+	crossorigin="anonymous" />
+
+<link href="https://fonts.gstatic.com" rel="preconnect" />
+<link
+	href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+	rel="stylesheet" />
+
+<link href="assets/vendor/bootstrap/css/bootstrap.min.css"
+	rel="stylesheet" />
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.css"
+	rel="stylesheet" />
+<link href="assets/vendor/boxicons/css/boxicons.min.css"
+	rel="stylesheet" />
+<link href="assets/vendor/quill/quill.snow.css" rel="stylesheet" />
+<link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet" />
+<link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet" />
+<link href="assets/vendor/simple-datatables/style.css" rel="stylesheet" />
+<link href="assets/css/style.css" rel="stylesheet" />
+</head>
+
+<body>
+	<div th:replace="~{teacher/nav :: body}"></div>
+	<main id="main" class="main">
+		<div class="pagetitle">
+			<h1>Schedule</h1>
+			<nav>
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="index.html">Home</a></li>
+					<li class="breadcrumb-item active">Schedule</li>
+				</ol>
+			</nav>
+		</div>
+
+		<section class="section timetable">
+
+			<input type="hidden" id="teacherId"
+				th:value="${userDetails.teacherid}" />
+
+			<div class="card" id="timetableContent">
+				<div class="card-body">
+					<table class="table-custom"
+						style="margin: 0; margin-top:25px; text-align: center; max-width: 100wh">
+						<thead>
+							<tr class="bg-light-gray">
+								<th class="text-uppercase"
+									style="border-right: 2px solid #dddddd">Time</th>
+								<th class="text-uppercase" id="mon">Monday</th>
+								<th class="text-uppercase" id="tue">Tuesday</th>
+								<th class="text-uppercase" id="wed">Wednesday</th>
+								<th class="text-uppercase" id="thu">Thursday</th>
+								<th class="text-uppercase" id="fri">Friday</th>
+								<th class="text-uppercase" id="sat">Saturday</th>
+							</tr>
+						</thead>
+						<tbody id="timetable-body"></tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+	<script>
+	document.addEventListener("DOMContentLoaded", () => {
+	    const teacherId = document.getElementById("teacherId").value; 
+	    if (teacherId) {
+	        fetchTeacherTimetable(teacherId);
+	    }
+	});
+
+	async function fetchTeacherTimetable(teacherId) {
+	    const url = `/api/timetable/teacher/${teacherId}`;
+	    try {
+	        const response = await fetch(url);
+	        if (!response.ok) {
+	            throw new Error(`HTTP error! Status: ${response.status}`);
+	        }
+	        const data = await response.json(); // Parse the response JSON
+	        populateTimetable(data); // Call function to populate timetable
+	    } catch (error) {
+	        console.error("Error fetching timetable:", error);
+	        alert("Failed to load timetable.");
+	    }
+	}
+
+	function populateTimetable(data) {
+	    const timetableBody = document.getElementById("timetable-body");
+	    timetableBody.innerHTML = ""; // Clear existing rows
+
+	    const times = [
+            "8:00",
+            "9:00",
+            "10:00",
+            "11:00",
+            "12:00",
+            "13:00",
+            "14:00",
+            "15:00",
+            "16:00",
+            "17:00",
+          ];
+          const days = [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ];
+
+	    times.forEach((time) => {
+	        const row = document.createElement("tr");
+	        const timeCell = document.createElement("td");
+	        timeCell.textContent = time;
+	        timeCell.style.borderRight = "2px solid #dddddd";	
+	        row.appendChild(timeCell);
+
+	        days.forEach((day) => {
+	            const cell = document.createElement("td");
+	            cell.dataset.time = time.padStart(5, "0");
+	            cell.dataset.day = day;
+	            row.appendChild(cell);
+	        });
+
+	        timetableBody.appendChild(row);
+	    });
+
+	    data.forEach((entry) => {
+	        const { day, startTime, program, semester, subject, teacher } = entry;
+	        const normalizedDay = day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
+	        const formattedStartTime = startTime.padStart(5, "0");
+
+	        const cell = document.querySelector(
+	        		`td[data-day="${normalizedDay}"][data-time="${formattedStartTime}"]`
+
+	        	);
+
+	        if (cell) {
+	            cell.innerHTML = `
+	                <div class="lecture">
+	                    <span>${subject}</span>
+	                    <div>${formattedStartTime} - ${entry.endTime}</div>
+	                    <div style="font-weight:600;">${program} ${semester}</div>
+	                </div>`;
+	        }
+	    });
+	}
+
+
+    </script>
+
+	<script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+	<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="assets/vendor/chart.js/chart.umd.js"></script>
+	<script src="assets/vendor/echarts/echarts.min.js"></script>
+	<script src="assets/vendor/quill/quill.js"></script>
+	<script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+	<script src="assets/vendor/tinymce/tinymce.min.js"></script>
+	<script src="assets/vendor/php-email-form/validate.js"></script>
+
+	<script src="assets/js/main.js"></script>
+</body>
+</html>
